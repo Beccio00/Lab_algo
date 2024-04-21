@@ -1,10 +1,43 @@
-import HashHeap
+# Hash heap
+class NodeHeap:
+    def __init__(self, k, v):
+        self.key = k
+        self.value = v
+
+class HashHeap:
+    def __init__(self, size):
+        self.heap = []
+        self.size = size
+        self.hash = [LinkedList] * size
+        for i in range(size):
+            self.hash[i] = LinkedList()
+
+    def _hash(self, k):
+        # È stato scelto A = (sqrt(5) -1)/2 secondo Knuth
+        A = 0.61803398875
+        key = int(self.size * ((k * A) % 1))
+        return key
+
+    def insert(self, k, v):
+        index = self._hash(k)
+        if self.hash[index].search(k) is not None:
+            return
+        x = NodeHeap(k, v)
+        self.heap.append(x)
+        self.hash[index].insert(k, len(self.heap) - 1)
+        self.max_heapify(len(self.heap) - 1)
+
+    def max_heapify(self, i):
 
 
-class Node:
+
+
+
+# Lista concatenata
+class NodeLinkedList:
     def __init__(self, init_data):
         self.data = init_data
-        self.next = None     # come Nil e Null
+        self.next = None
 
     def get_data(self):
         return self.data
@@ -13,10 +46,11 @@ class Node:
         return self.next
 
     def set_data(self, new_data):
-        self.data = newdata
+        self.data = new_data
 
     def set_next(self, new_next):
         self.next = new_next
+
 
 class LinkedList:
     def __init__(self):
@@ -26,7 +60,7 @@ class LinkedList:
         return self.head == None
 
     def add(self, item):
-        temp = Node(item)
+        temp = NodeLinkedList(item)
         temp.set_next(self.head)
         self.head = temp
 
@@ -38,7 +72,7 @@ class LinkedList:
             current = current.get_next()
         return count
 
-# Cerchiamo  elementi e stampiamo la lista
+    # Cerchiamo  elementi e stampiamo la lista
     def search(self, item):
         current = self.head
         found = False
@@ -53,10 +87,10 @@ class LinkedList:
         current = self.head
         previous = None
         while current != None:
-            print('..' , current.get_data())
+            print('..', current.get_data())
             current = current.get_next()
 
-# cancelliamo elemento
+    # cancelliamo elemento
 
     def remove(self, item):
         current = self.head
@@ -73,22 +107,26 @@ class LinkedList:
         else:
             previous.set_next(current.get_next())
 
+# Albero binario di ricerca
 class NodeABR:
-   def __init__(self, key):
-      self.key = key
-      self.left = None
-      self.right = None
-   def get(self):
-      return self.key
-   def set(self, key):
-      self.key = key
-   def getChildren(self):
-      children = []
-      if (self.left != None):
-         children.append(self.left)
-      if (self.right != None):
-         children.append(self.right)
-      return children
+    def __init__(self, key):
+        self.key = key
+        self.left = None
+        self.right = None
+
+    def get(self):
+        return self.key
+
+    def set(self, key):
+        self.key = key
+
+    def getChildren(self):
+        children = []
+        if (self.left != None):
+            children.append(self.left)
+        if (self.right != None):
+            children.append(self.right)
+        return children
 
 
 class ABR:
@@ -96,7 +134,7 @@ class ABR:
         self.root = None
 
     def setRoot(self, key):
-        self.root = Node(key)
+        self.root = NodeABR(key)
 
     def insert(self, key):
         if (self.root is None):
@@ -109,12 +147,12 @@ class ABR:
             if (currentNode.left):
                 self.insertNode(currentNode.left, key)
             else:
-                currentNode.left = Node(key)
+                currentNode.left = NodeABR(key)
         elif (key > currentNode.key):
             if (currentNode.right):
                 self.insertNode(currentNode.right, key)
             else:
-                currentNode.right = Node(key)
+                currentNode.right = NodeABR(key)
 
     def find(self, key):
         return self.findNode(self.root, key)
@@ -140,5 +178,3 @@ class ABR:
                 _inorder(v.right)
 
         _inorder(self.root)
-
-HashHeap
