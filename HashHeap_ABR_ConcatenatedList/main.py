@@ -12,14 +12,47 @@ class HashHeap:
         for i in range(size):
             self.hash[i] = LinkedList()
 
-    def _hash(self, k):
+    def hash(self, k):
         # È stato scelto A = (sqrt(5) -1)/2 secondo Knuth
         A = 0.61803398875
         key = int(self.size * ((k * A) % 1))
         return key
 
+
+    def max_heapify(self, i):
+        l = self.left(i)
+        r = self.right(i)
+        max = i
+
+        if l <= self.size and self.heap[l].value > self.heap[i].value:
+            max = l
+
+        if r <= self.size and self.heap[r].value > self.heap[max].value:
+            max = r
+
+        if max != i:
+            self.swap(max, i)
+            self.max_heapify(max)
+
+    def min_heapify(self, i):
+        l = self.left(i)
+        r = self.right(i)
+        min = i
+
+        if l <= self.size and self.heap[l].value < self.heap[i].value:
+            min = l
+
+        if r <= self.size and self.heap[r].value < self.heap[min].value:
+            min = r
+
+        if min != i:
+            self.swap(min, i)
+            self.max_heapify(min)
+
+
+
     def insert(self, k, v):
-        index = self._hash(k)
+        index = self.hash(k)
         if self.hash[index].search(k) is not None:
             return
         x = NodeHeap(k, v)
@@ -27,7 +60,23 @@ class HashHeap:
         self.hash[index].insert(k, len(self.heap) - 1)
         self.max_heapify(len(self.heap) - 1)
 
-    def max_heapify(self, i):
+    def swap(self, i, j):
+
+    def parent(self, i):
+        return (i - 1)//2
+
+    def left(self, i):
+        return i*2 + 1
+
+    def right(self, i):
+        return i*2 + 2
+
+
+
+
+
+
+
 
 
 
