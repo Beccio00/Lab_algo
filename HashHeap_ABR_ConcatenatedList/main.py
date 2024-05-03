@@ -8,7 +8,7 @@ class HashHeap:
     def __init__(self, size):
         self.heap = []
         self.size = size
-        self.hash = [LinkedList] * size
+        self.hash_table = [LinkedList] * size
         for i in range(size):
             self.hash[i] = LinkedList()
 
@@ -49,18 +49,36 @@ class HashHeap:
             self.swap(min, i)
             self.max_heapify(min)
 
-
-
     def insert(self, k, v):
         index = self.hash(k)
-        if self.hash[index].search(k) is not None:
+        if self.hash_table[index].search(k) is not None:
             return
         x = NodeHeap(k, v)
         self.heap.append(x)
-        self.hash[index].insert(k, len(self.heap) - 1)
+        self.hash_table[index].insert(k, len(self.heap) - 1)
         self.max_heapify(len(self.heap) - 1)
 
     def swap(self, i, j):
+        #scambia gli indici
+        k1 = self.heap[i].key
+        index1 = self.hash(k1)
+        element1 = self.hash_table[index1].search(k1)
+        element1.index = j
+
+        k2 = self.heap[j].key
+        index2 = self.hash(k2)
+        element2 = self.hash_table[index2].search(k2)
+        element2.index = j
+
+        #scambia i valori nell heap
+        self.heap[i], self.heap[j] = self.heap[j] = self.heap[i]
+
+
+
+
+
+
+
 
     def parent(self, i):
         return (i - 1)//2
