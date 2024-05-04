@@ -39,10 +39,26 @@ class HashHeap:
                     self.hash_map[index] = curr.next
             prev, curr = curr, curr.next
         else:
-            return
+            return KeyError("Elemento da eliminare con chiave " + key + " non trovato")
         self.swap(index, len(self.heap) - 1)
         del self.heap[-1]
         self.min_heapify(index)
+
+    def update(self, key, new_value):
+        hash_index = self._hash(key)
+        curr = self.hash_map[hash_index]
+        while curr:
+            if curr.key == key:
+                index = curr.value
+                self.heap[index] = new_value
+                break
+            curr = curr.next
+        else:
+            return KeyError("Elemento da modificare con chiave " + key + " non trovato")
+        if new_value > self.heap[index]:
+            self.max_heapify(index)
+        elif new_value < self.heap[index]:
+            self.min_heapify(index)
 
     def max_heapify(self, i):
         if i > 0:
@@ -67,6 +83,8 @@ class HashHeap:
         else:
             return
 
+    def _swap(self, i , j):
+        self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
 
 
 # Lista concatenata
