@@ -1,102 +1,71 @@
 # Hash heap
-class NodeHeap:
-    def __init__(self, k, v):
-        self.key = k
-        self.value = v
+class HashMapListNode:
+    def __init__(self, key, value, next = None):
+        self.key = key
+        self.value = value #rappresenta la posizione dell'elemento nell'heap
+        self.next = next
 
 class HashHeap:
-    def __init__(self, size):
+    def __int__(self, size):
+        self.hash_map = [None] * size
         self.heap = []
-        self.size = size
-        self.hash_table = [LinkedList] * size
-        for i in range(size):
-            self.hash[i] = LinkedList()
 
-    def hash(self, k):
-        # È stato scelto A = (sqrt(5) -1)/2 secondo Knuth
+    def _hash(self, key):
+        #scelgo A come secondo Knuth
         A = 0.61803398875
-        key = int(self.size * ((k * A) % 1))
-        return key
+        hash_key = int(self.table_size*((key * A) % 1))
+        return hash_key
 
-
-    def max_heapify(self, i):
-        l = self.left(i)
-        r = self.right(i)
-        max = i
-
-        if l <= self.size and self.heap[l].value > self.heap[i].value:
-            max = l
-
-        if r <= self.size and self.heap[r].value > self.heap[max].value:
-            max = r
-
-        if max != i:
-            self.swap(max, i)
-            self.max_heapify(max)
-
-    def min_heapify(self, i):
-        l = self.left(i)
-        r = self.right(i)
-        min = i
-
-        if l <= self.size and self.heap[l].value < self.heap[i].value:
-            min = l
-
-        if r <= self.size and self.heap[r].value < self.heap[min].value:
-            min = r
-
-        if min != i:
-            self.swap(min, i)
-            self.max_heapify(min)
-
-    def insert(self, k, v):
-        index = self.hash(k)
-        if self.hash_table[index].search(k) is not None:
-            return
-        x = NodeHeap(k, v)
-        self.heap.append(x)
-        self.hash_table[index].insert(k, len(self.heap) - 1)
+    def insert(self, key, value):
+        hash_index = self._hash(key)
+        #creo un nodo dell'hash map che è formato dalla chiave,
+        #la lunghezza dell'heap dato che value rappresenta, il next il nodo corrente
+        #perciò ci possono essere collisioni
+        node = HashMapListNode(key, len(self.heap), self.hash_map[hash_index])
+        self.hash_map[hash_index] = node
+        self.heap.append(value)
         self.max_heapify(len(self.heap) - 1)
 
-    def swap(self, i, j):
-        #scambia gli indici
-        k1 = self.heap[i].key
-        index1 = self.hash(k1)
-        element1 = self.hash_table[index1].search(k1)
-        element1.index = j
+    def delete(self, key):
+        hash_index = self._hash(key)
+        prev = None
+        curr = self.hash_map[hash_index]
+        while curr:
+            if curr.key == key:
+                index = curr.value
+                if prev:
+                    prev.next = curr.next
+                else:
+                    self.hash_map[index] = curr.next
+            prev, curr = curr, curr.next
+        else:
+            return
+        self.swap(index, len(self.heap) - 1)
+        del self.heap[-1]
+        self.min_heapify(index)
 
-        k2 = self.heap[j].key
-        index2 = self.hash(k2)
-        element2 = self.hash_table[index2].search(k2)
-        element2.index = j
+    def max_heapify(self, i):
+        if i > 0:
+            p = (i - 1) // 2
+            if self.heap[i] > self.heap[p]:
+                self.swap(i, p)
+                self.max_heapify(p)
+        else:
+            return
 
-        #scambia i valori nell heap
-        self.heap[i], self.heap[j] = self.heap[j] = self.heap[i]
-
-
-
-
-
-
-
-
-    def parent(self, i):
-        return (i - 1)//2
-
-    def left(self, i):
-        return i*2 + 1
-
-    def right(self, i):
-        return i*2 + 2
-
-
-
-
-
-
-
-
-
+    def min_heapify(self, i):
+        l = 2*i + 1 #Figlio sinistro
+        r = 2*i + 2 #Figlio destro
+        min = i
+        if l < len(self.heap) and self.heap[l] < self.heap[i]:
+            min = l
+        if r < len(self.heap) and self.heap[r] < self.heap[min]:
+            min = r
+        if min != i:
+            self.swap(i, min)
+            self.min_heapify(self, min)
+        else:
+            return
 
 
 
@@ -173,6 +142,7 @@ class LinkedList:
             self.head = current.get_next()
         else:
             previous.set_next(current.get_next())
+
 
 # Albero binario di ricerca
 class NodeABR:
