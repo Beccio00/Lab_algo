@@ -88,6 +88,12 @@ class HashHeap:
     def swap(self, i, j):
         self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
 
+    def search(self, key):
+        hash_index = self._hash(key)
+        current = self.hash_map[hash_index]
+
+
+
 
 # Lista concatenata
 class NodeLinkedList:
