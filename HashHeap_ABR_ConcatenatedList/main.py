@@ -1,19 +1,21 @@
 # Hash heap
 class HashMapListNode:
-    def __init__(self, key, value, next = None):
+    def __init__(self, key, value, next=None):
         self.key = key
-        self.value = value #rappresenta la posizione dell'elemento nell'heap
+        self.value = value  #rappresenta la posizione dell'elemento nell'heap
         self.next = next
 
+
 class HashHeap:
-    def __int__(self, size):
+    def __int__(self, size=100):
         self.hash_map = [None] * size
         self.heap = []
+        self.table_size = size
 
     def _hash(self, key):
         #scelgo A come secondo Knuth
         A = 0.61803398875
-        hash_key = int(self.table_size*((key * A) % 1))
+        hash_key = int(self.table_size * ((key * A) % 1))
         return hash_key
 
     def insert(self, key, value):
@@ -70,8 +72,8 @@ class HashHeap:
             return
 
     def min_heapify(self, i):
-        l = 2*i + 1 #Figlio sinistro
-        r = 2*i + 2 #Figlio destro
+        l = 2 * i + 1  #Figlio sinistro
+        r = 2 * i + 2  #Figlio destro
         min = i
         if l < len(self.heap) and self.heap[l] < self.heap[i]:
             min = l
@@ -79,11 +81,11 @@ class HashHeap:
             min = r
         if min != i:
             self.swap(i, min)
-            self.min_heapify(self, min)
+            self.min_heapify(min)
         else:
             return
 
-    def _swap(self, i , j):
+    def swap(self, i, j):
         self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
 
 
@@ -121,30 +123,47 @@ class LinkedList:
     def size(self):
         current = self.head
         count = 0
-        while current != None:
+        while current is not None:
             count = count + 1
             current = current.get_next()
         return count
 
-    # Cerchiamo  elementi e stampiamo la lista
     def search(self, item):
         current = self.head
         found = False
-        while current != None and not found:
+        while current is not None and not found:
             if current.get_data() == item:
                 found = True
             else:
                 current = current.get_next()
         return found
 
-    def PrintL(self):
+    def find_maximum(self):
+        current = self.head.get_next()
+        max = self.head.get_data()
+        while current is not None:
+            if current.get_data > max:
+                max = current.get_data
+            else:
+                current = current.get_next()
+        return max
+
+    def find_minimum(self):
+        current = self.head.get_next()
+        min = self.head.get_data()
+        while current is not None:
+            if current.get_data < min:
+                min = current.get_data
+            else:
+                current = current.get_next()
+        return min
+
+    def print_l(self):
         current = self.head
         previous = None
-        while current != None:
+        while current is not None:
             print('..', current.get_data())
             current = current.get_next()
-
-    # cancelliamo elemento
 
     def remove(self, item):
         current = self.head
@@ -156,7 +175,7 @@ class LinkedList:
             else:
                 previous = current
                 current = current.get_next()
-        if previous == None:
+        if previous is None:
             self.head = current.get_next()
         else:
             previous.set_next(current.get_next())
@@ -175,7 +194,7 @@ class NodeABR:
     def set(self, key):
         self.key = key
 
-    def getChildren(self):
+    def get_children(self):
         children = []
         if (self.left != None):
             children.append(self.left)
@@ -188,39 +207,57 @@ class ABR:
     def __init__(self):
         self.root = None
 
-    def setRoot(self, key):
+    def set_root(self, key):
         self.root = NodeABR(key)
 
     def insert(self, key):
         if (self.root is None):
-            self.setRoot(key)
+            self.set_root(key)
         else:
-            self.insertNode(self.root, key)
+            self.insert_node(self.root, key)
 
-    def insertNode(self, currentNode, key):
+    def insert_node(self, currentNode, key):
         if (key <= currentNode.key):
             if (currentNode.left):
-                self.insertNode(currentNode.left, key)
+                self.insert_node(currentNode.left, key)
             else:
                 currentNode.left = NodeABR(key)
         elif (key > currentNode.key):
             if (currentNode.right):
-                self.insertNode(currentNode.right, key)
+                self.insert_node(currentNode.right, key)
             else:
                 currentNode.right = NodeABR(key)
 
-    def find(self, key):
-        return self.findNode(self.root, key)
+    def search(self, key):
+        return self.search_node(self.root, key)
 
-    def findNode(self, currentNode, key):
+    def search_node(self, currentNode, key):
         if (currentNode is None):
             return False
         elif (key == currentNode.key):
             return True
         elif (key < currentNode.key):
-            return self.findNode(currentNode.left, key)
+            return self.search_node(currentNode.left, key)
         else:
-            return self.findNode(currentNode.right, key)
+            return self.search_node(currentNode.right, key)
+
+    def find_minimum(self):
+        def _searchMinimum(currentNode):
+            if currentNode.left is not None:
+                return _searchMinimum(currentNode.left)
+            else:
+                return currentNode
+
+        _searchMinimum(self.root)
+
+    def find_maximum(self):
+        def _find_maximum(currentNode):
+            if currentNode.right is not None:
+                return _find_maximum(currentNode.right)
+            else:
+                return currentNode
+
+        _find_maximum(self.root)
 
     def inorder(self):
         def _inorder(v):
@@ -233,3 +270,13 @@ class ABR:
                 _inorder(v.right)
 
         _inorder(self.root)
+
+
+#Main
+def main():
+    hashHeap = HashHeap()
+    linkedList = LinkedList()
+    abr = ABR()
+
+    if __name__ == "__main__":
+        main()
