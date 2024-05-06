@@ -4,18 +4,18 @@ class HashMapListNode:
         self.key = key
         self.value = value  #rappresenta la posizione dell'elemento nell'heap
         self.next = next
-
+#FIXME Ho capito che deve per forza essere un vettore di liste concatenate, dove il nodo deve avere chiave-valore
 
 class HashHeap:
-    def __int__(self, size=100):
-        self.hash_map = [None] * size
+    def __init__(self, size=10):
+        self.hash_map = [LinkedListForHash() for _ in range(size)]
         self.heap = []
         self.table_size = size
 
     def _hash(self, key):
         #scelgo A come secondo Knuth
         A = 0.61803398875
-        hash_key = int(self.table_size * ((key * A) % 1))
+        hash_key = int(self.table_size * ((float(key) * A) % 1))
         return hash_key
 
     def insert(self, key, value):
@@ -24,6 +24,8 @@ class HashHeap:
         #la lunghezza dell'heap dato che value rappresenta, il next il nodo corrente
         #perciò ci possono essere collisioni
         node = HashMapListNode(key, len(self.heap), self.hash_map[hash_index])
+        if self.hash_map[hash_index] is not None:
+            node.next = self.hash_map[hash_index].next
         self.hash_map[hash_index] = node
         self.heap.append(value)
         self.max_heapify_parent(len(self.heap) - 1)
@@ -92,8 +94,8 @@ class HashHeap:
         hash_index = self._hash(key)
         current = self.hash_map[hash_index]
         while current is not None:
-            if self.heap[current] == key:
-                return self.heap[current]
+            if self.heap[current.value] == key:
+                return self.heap[current.value]
             current = current.next
         return None
 
@@ -112,7 +114,45 @@ class HashHeap:
                 min = value
         return min
 
+class LinkedListForHashNode:
+    def __init__(self, key, value):
+        self.key = key
+        self.valeu = value
+        self.next = None
 
+class LinkedListForHash:
+    def __init__(self):
+        self.head = None
+
+    def is_empty(self):
+        return self.head == None
+
+    def add(self, key, value):
+        new_node = NodeLinkedList(key, value)
+        new_node.next = self.head
+        self.head = new_node
+
+    def search(self, key):
+        current = self.head
+        while current is not None:
+            if current.key == key:
+                return current
+            current = current.next
+        return None
+
+    def remove(self, key):
+        current = self.head
+        previous = None
+        while current is not None:
+            if current.key == key:
+                if previous is not None:
+                    previous.next = current.next
+                else:
+                    self.head = current.next
+                return True
+            previous = current
+            current = current.next
+        return False
 
 # Lista concatenata
 class NodeLinkedList:
@@ -303,5 +343,25 @@ def main():
     linkedList = LinkedList()
     abr = ABR()
 
-    if __name__ == "__main__":
-        main()
+    hashHeap.insert(1, 10)
+    hashHeap.insert(2, 20)
+    hashHeap.insert(3, 30)
+    #hashHeap.insert(3, 40)
+
+    linkedList.add(10)
+    linkedList.add(20)
+    linkedList.add(30)
+
+    abr.insert(10)
+    abr.insert(20)
+    abr.insert(30)
+
+    print(hashHeap.search(2))
+    print(hashHeap.find_maximum())
+    print(hashHeap.find_minimum())
+
+
+
+
+if __name__ == "__main__":
+    main()
