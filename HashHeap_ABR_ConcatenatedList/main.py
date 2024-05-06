@@ -26,62 +26,62 @@ class HashHeap:
         node = HashMapListNode(key, len(self.heap), self.hash_map[hash_index])
         self.hash_map[hash_index] = node
         self.heap.append(value)
-        self.max_heapify(len(self.heap) - 1)
+        self.max_heapify_parent(len(self.heap) - 1)
 
     def delete(self, key):
         hash_index = self._hash(key)
         prev = None
-        curr = self.hash_map[hash_index]
-        while curr:
-            if curr.key == key:
-                index = curr.value
+        current = self.hash_map[hash_index]
+        while current:
+            if current.key == key:
+                index = current.value
                 if prev:
-                    prev.next = curr.next
+                    prev.next = current.next
                 else:
-                    self.hash_map[index] = curr.next
-            prev, curr = curr, curr.next
+                    self.hash_map[index] = current.next
+            prev, current = current, current.next
         else:
             return KeyError("Elemento da eliminare con chiave " + key + " non trovato")
         self.swap(index, len(self.heap) - 1)
         del self.heap[-1]
-        self.min_heapify(index)
+        self.max_heapify_child(index)
 
     def update(self, key, new_value):
         hash_index = self._hash(key)
-        curr = self.hash_map[hash_index]
-        while curr:
-            if curr.key == key:
-                index = curr.value
+        current = self.hash_map[hash_index]
+        while current:
+            if current.key == key:
+                index = current.value
                 self.heap[index] = new_value
                 break
-            curr = curr.next
+            current = current.next
         else:
             return KeyError("Elemento da modificare con chiave " + key + " non trovato")
         if new_value > self.heap[index]:
-            self.max_heapify(index)
+            self.max_heapify_parent(index)
         elif new_value < self.heap[index]:
-            self.min_heapify(index)
+            self.max_heapify_child(index)
 
-    def max_heapify(self, i):
+    def max_heapify_parent(self, i):
         if i > 0:
             p = (i - 1) // 2
             if self.heap[i] > self.heap[p]:
                 self.swap(i, p)
-                self.max_heapify(p)
+                self.max_heapify_parent(p)
         else:
             return
 
-    def min_heapify(self, i):
+    def max_heapify_child(self, i):
         l = 2 * i + 1  #Figlio sinistro
         r = 2 * i + 2  #Figlio destro
-        min = i
-        if l < len(self.heap) and self.heap[l] < self.heap[i]:
-            min = l
-        if r < len(self.heap) and self.heap[r] < self.heap[min]:
-            min = r
-        if min != i:
-            self.swap(i, min)
-            self.min_heapify(min)
+        max = i
+        if l < len(self.heap) and self.heap[l] > self.heap[i]:
+            max = l
+        if r < len(self.heap) and self.heap[r] > self.heap[max]:
+            max = r
+        if max != i:
+            self.swap(i, max)
+            self.max_heapify_child(max)
         else:
             return
 
@@ -91,7 +91,26 @@ class HashHeap:
     def search(self, key):
         hash_index = self._hash(key)
         current = self.hash_map[hash_index]
+        while current is not None:
+            if self.heap[current] == key:
+                return self.heap[current]
+            current = current.next
+        return None
 
+    def find_maximum(self):
+        if not self.heap:
+            return None
+        return self.heap[0]
+        #Siccome è un max heap il massimo sta alla radice
+
+    def find_minimum(self):
+        if not self.heap:
+            return None
+        min = self.heap[0]
+        for value in self.heap:
+            if value < min:
+                min = value
+        return min
 
 
 
