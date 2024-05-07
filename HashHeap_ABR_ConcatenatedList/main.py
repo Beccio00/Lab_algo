@@ -1,167 +1,14 @@
-# Hash heap
-class HashMapListNode:
-    def __init__(self, key, value, next=None):
-        self.key = key
-        self.value = value  #rappresenta la posizione dell'elemento nell'heap
-        self.next = next
-#FIXME Ho capito che deve per forza essere un vettore di liste concatenate, dove il nodo deve avere chiave-valore
-
-class HashHeap:
-    def __init__(self, size=10):
-        self.hash_map = [LinkedListForHash() for _ in range(size)]
-        self.heap = []
-        self.table_size = size
-
-    def _hash(self, key):
-        #scelgo A come secondo Knuth
-        A = 0.61803398875
-        hash_key = int(self.table_size * ((float(key) * A) % 1))
-        return hash_key
-
-    def insert(self, key, value):
-        hash_index = self._hash(key)
-        #creo un nodo dell'hash map che è formato dalla chiave,
-        #la lunghezza dell'heap dato che value rappresenta, il next il nodo corrente
-        #perciò ci possono essere collisioni
-        node = HashMapListNode(key, len(self.heap), self.hash_map[hash_index])
-        if self.hash_map[hash_index] is not None:
-            node.next = self.hash_map[hash_index].next
-        self.hash_map[hash_index] = node
-        self.heap.append(value)
-        self.max_heapify_parent(len(self.heap) - 1)
-
-    def delete(self, key):
-        hash_index = self._hash(key)
-        prev = None
-        current = self.hash_map[hash_index]
-        while current:
-            if current.key == key:
-                index = current.value
-                if prev:
-                    prev.next = current.next
-                else:
-                    self.hash_map[index] = current.next
-            prev, current = current, current.next
-        else:
-            return KeyError("Elemento da eliminare con chiave " + key + " non trovato")
-        self.swap(index, len(self.heap) - 1)
-        del self.heap[-1]
-        self.max_heapify_child(index)
-
-    def update(self, key, new_value):
-        hash_index = self._hash(key)
-        current = self.hash_map[hash_index]
-        while current:
-            if current.key == key:
-                index = current.value
-                self.heap[index] = new_value
-                break
-            current = current.next
-        else:
-            return KeyError("Elemento da modificare con chiave " + key + " non trovato")
-        if new_value > self.heap[index]:
-            self.max_heapify_parent(index)
-        elif new_value < self.heap[index]:
-            self.max_heapify_child(index)
-
-    def max_heapify_parent(self, i):
-        if i > 0:
-            p = (i - 1) // 2
-            if self.heap[i] > self.heap[p]:
-                self.swap(i, p)
-                self.max_heapify_parent(p)
-        else:
-            return
-
-    def max_heapify_child(self, i):
-        l = 2 * i + 1  #Figlio sinistro
-        r = 2 * i + 2  #Figlio destro
-        max = i
-        if l < len(self.heap) and self.heap[l] > self.heap[i]:
-            max = l
-        if r < len(self.heap) and self.heap[r] > self.heap[max]:
-            max = r
-        if max != i:
-            self.swap(i, max)
-            self.max_heapify_child(max)
-        else:
-            return
-
-    def swap(self, i, j):
-        self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
-
-    def search(self, key):
-        hash_index = self._hash(key)
-        current = self.hash_map[hash_index]
-        while current is not None:
-            if self.heap[current.value] == key:
-                return self.heap[current.value]
-            current = current.next
-        return None
-
-    def find_maximum(self):
-        if not self.heap:
-            return None
-        return self.heap[0]
-        #Siccome è un max heap il massimo sta alla radice
-
-    def find_minimum(self):
-        if not self.heap:
-            return None
-        min = self.heap[0]
-        for value in self.heap:
-            if value < min:
-                min = value
-        return min
-
-class LinkedListForHashNode:
-    def __init__(self, key, value):
-        self.key = key
-        self.valeu = value
-        self.next = None
-
-class LinkedListForHash:
-    def __init__(self):
-        self.head = None
-
-    def is_empty(self):
-        return self.head == None
-
-    def add(self, key, value):
-        new_node = NodeLinkedList(key, value)
-        new_node.next = self.head
-        self.head = new_node
-
-    def search(self, key):
-        current = self.head
-        while current is not None:
-            if current.key == key:
-                return current
-            current = current.next
-        return None
-
-    def remove(self, key):
-        current = self.head
-        previous = None
-        while current is not None:
-            if current.key == key:
-                if previous is not None:
-                    previous.next = current.next
-                else:
-                    self.head = current.next
-                return True
-            previous = current
-            current = current.next
-        return False
-
 # Lista concatenata
+from numpy.core import overrides
+
+
 class NodeLinkedList:
-    def __init__(self, init_data):
-        self.data = init_data
+    def __init__(self, value):
+        self.value = value
         self.next = None
 
-    def get_data(self):
-        return self.data
+    def get_value(self):
+        return self.value
 
     def get_next(self):
         return self.next
@@ -197,7 +44,7 @@ class LinkedList:
         current = self.head
         found = False
         while current is not None and not found:
-            if current.get_data() == item:
+            if current.get_value() == item:
                 found = True
             else:
                 current = current.get_next()
@@ -205,20 +52,20 @@ class LinkedList:
 
     def find_maximum(self):
         current = self.head.get_next()
-        max = self.head.get_data()
+        max = self.head.get_value()
         while current is not None:
-            if current.get_data > max:
-                max = current.get_data
+            if current.get_value > max:
+                max = current.get_valu
             else:
                 current = current.get_next()
         return max
 
     def find_minimum(self):
         current = self.head.get_next()
-        min = self.head.get_data()
+        min = self.head.get_valu()
         while current is not None:
-            if current.get_data < min:
-                min = current.get_data
+            if current.get_valu < min:
+                min = current.get_valu
             else:
                 current = current.get_next()
         return min
@@ -227,7 +74,7 @@ class LinkedList:
         current = self.head
         previous = None
         while current is not None:
-            print('..', current.get_data())
+            print('..', current.get_value())
             current = current.get_next()
 
     def remove(self, item):
@@ -235,7 +82,7 @@ class LinkedList:
         previous = None
         found = False
         while not found:
-            if current.get_data() == item:
+            if current.get_valu() == item:
                 found = True
             else:
                 previous = current
@@ -337,6 +184,175 @@ class ABR:
         _inorder(self.root)
 
 
+# Hash heap
+
+class HashHeap:
+    def __init__(self, size=10):
+        self.hash_map = [LinkedListForHash() for _ in range(size)]
+        self.heap = []
+        self.table_size = size
+
+    def _hash(self, key):
+        #scelgo A come secondo Knuth
+        A = 0.61803398875
+        hash_key = int(self.table_size * ((float(key) * A) % 1))
+        return hash_key
+
+    def insert(self, key, value):
+        hash_index = self._hash(key)
+        self.hash_map[hash_index].add((key, len(self.heap)))
+        self.heap.append(value)
+        self.max_heapify_parent(len(self.heap) - 1)
+
+    def delete(self, key):
+        hash_index = self._hash(key)
+        prev = None
+        current = self.hash_map[hash_index]
+        while current:
+            if current.key == key:
+                index = current.value
+                if prev:
+                    prev.next = current.next
+                else:
+                    self.hash_map[index] = current.next
+            prev, current = current, current.next
+        else:
+            return KeyError("Elemento da eliminare con chiave " + key + " non trovato")
+        self.swap(index, len(self.heap) - 1)
+        del self.heap[-1]
+        self.max_heapify_child(index)
+
+    def update(self, key, new_value):
+        hash_index = self._hash(key)
+        current = self.hash_map[hash_index]
+        while current:
+            if current.key == key:
+                index = current.value
+                self.heap[index] = new_value
+                break
+            current = current.next
+        else:
+            return KeyError("Elemento da modificare con chiave " + key + " non trovato")
+        if new_value > self.heap[index]:
+            self.max_heapify_parent(index)
+        elif new_value < self.heap[index]:
+            self.max_heapify_child(index)
+
+    def max_heapify_parent(self, i):
+        if i > 0:
+            p = (i - 1) // 2
+            if self.heap[i] > self.heap[p]:
+                self.swap(i, p)
+                self.max_heapify_parent(p)
+        else:
+            return
+
+    def max_heapify_child(self, i):
+        l = 2 * i + 1  #Figlio sinistro
+        r = 2 * i + 2  #Figlio destro
+        max = i
+        if l < len(self.heap) and self.heap[l] > self.heap[i]:
+            max = l
+        if r < len(self.heap) and self.heap[r] > self.heap[max]:
+            max = r
+        if max != i:
+            self.swap(i, max)
+            self.max_heapify_child(max)
+        else:
+            return
+
+    def swap(self, i, j):
+        key_i = self.heap[i].key
+        hash_index_i = self.hash_map.index(key_i)
+        x = self.hash_map[hash_index_i].search(key_i)
+        x.value = j
+
+        key_j = self.heap[j].key
+        hash_index_j = self.hash_map.index(key_j)
+        y = self.hash_map[hash_index_j].search(key_j)
+        y.value = i
+
+        self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
+
+    def search(self, key):
+        hash_index = self._hash(key)
+        current = self.hash_map[hash_index]
+        while current is not None:
+            if self.heap[current.value] == key:
+                return self.heap[current.value]
+            current = current.next
+        return None
+
+    def find_maximum(self):
+        if not self.heap:
+            return None
+        return self.heap[0]
+        #Siccome è un max heap il massimo sta alla radice
+
+    def find_minimum(self):
+        if not self.heap:
+            return None
+        min = self.heap[0]
+        for value in self.heap:
+            if value < min:
+                min = value
+        return min
+
+
+class NodeLinkedListForHash(NodeLinkedList):
+    def __init__(self, key, value):
+        super().__init__(value) #In questo caso però value è la posizione dell' array heap
+        self.key = key
+
+    def get_key(self):
+        return self.key
+
+    @overrides
+    def set_data(self, key, new_data):
+        if self.key == key:
+            self.data = new_data
+
+    @overrides
+    def set_next(self, key, new_next):
+        if self.key == key:
+            self.next = new_next
+
+
+class LinkedListForHash(LinkedList):
+    def __init__(self):
+        super().__init__()
+
+    @overrides
+    def add(self, key, value):
+        new_node = NodeLinkedListForHash(key, value)
+        new_node.next = self.head
+        self.head = new_node
+
+    @overrides
+    def search(self, key):
+        current = self.head
+        while current is not None:
+            if current.key == key:
+                return current
+            current = current.next
+        return None
+
+    @overrides
+    def remove(self, key):
+        current = self.head
+        previous = None
+        while current is not None:
+            if current.key == key:
+                if previous is not None:
+                    previous.next = current.next
+                else:
+                    self.head = current.next
+                return True
+            previous = current
+            current = current.next
+        return False
+
+
 #Main
 def main():
     hashHeap = HashHeap()
@@ -359,8 +375,6 @@ def main():
     print(hashHeap.search(2))
     print(hashHeap.find_maximum())
     print(hashHeap.find_minimum())
-
-
 
 
 if __name__ == "__main__":
