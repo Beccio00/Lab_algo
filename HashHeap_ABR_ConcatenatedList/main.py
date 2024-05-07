@@ -1,11 +1,20 @@
-# Lista concatenata
-from numpy.core import overrides
+from abc import ABC, abstractmethod
 
 
-class NodeLinkedList:
+# Classi astratte per le liste concatenate
+
+class AbstractNodeLinkedList(ABC):
     def __init__(self, value):
         self.value = value
         self.next = None
+
+    @abstractmethod
+    def set_value(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def set_next(self, *args, **kwargs):
+        pass
 
     def get_value(self):
         return self.value
@@ -13,24 +22,25 @@ class NodeLinkedList:
     def get_next(self):
         return self.next
 
-    def set_data(self, new_data):
-        self.data = new_data
 
-    def set_next(self, new_next):
-        self.next = new_next
-
-
-class LinkedList:
+class AbstractLinkedList(ABC):
     def __init__(self):
         self.head = None
 
     def is_empty(self):
-        return self.head == None
+        return self.head is None
 
-    def add(self, item):
-        temp = NodeLinkedList(item)
-        temp.set_next(self.head)
-        self.head = temp
+    @abstractmethod
+    def add(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def remove(self, input):
+        pass
+
+    @abstractmethod
+    def search(self, input):
+        pass
 
     def size(self):
         current = self.head
@@ -39,6 +49,28 @@ class LinkedList:
             count = count + 1
             current = current.get_next()
         return count
+
+
+# Lista concatenata
+class NodeLinkedList(AbstractNodeLinkedList):
+    def __init__(self, value):
+        super().__init__(value)
+
+    def set_value(self, new_value, *args, **kwargs):
+        self.value = new_value
+
+    def set_next(self, new_next, *args, **kwargs):
+        self.next = new_next
+
+
+class LinkedList(AbstractLinkedList):
+    def __init__(self):
+        super().__init__()
+
+    def add(self, item, *args, **kwargs):
+        temp = NodeLinkedList(item)
+        temp.set_next(self.head)
+        self.head = temp
 
     def search(self, item):
         current = self.head
@@ -50,22 +82,37 @@ class LinkedList:
                 current = current.get_next()
         return found
 
+    def remove(self, item):
+        current = self.head
+        previous = None
+        found = False
+        while not found:
+            if current.get_value() == item:
+                found = True
+            else:
+                previous = current
+                current = current.get_next()
+        if previous is None:
+            self.head = current.get_next()
+        else:
+            previous.set_next(current.get_next())
+
     def find_maximum(self):
         current = self.head.get_next()
         max = self.head.get_value()
         while current is not None:
             if current.get_value > max:
-                max = current.get_valu
+                max = current.get_value()
             else:
                 current = current.get_next()
         return max
 
     def find_minimum(self):
         current = self.head.get_next()
-        min = self.head.get_valu()
+        min = self.head.get_value()
         while current is not None:
             if current.get_valu < min:
-                min = current.get_valu
+                min = current.get_value()
             else:
                 current = current.get_next()
         return min
@@ -76,21 +123,6 @@ class LinkedList:
         while current is not None:
             print('..', current.get_value())
             current = current.get_next()
-
-    def remove(self, item):
-        current = self.head
-        previous = None
-        found = False
-        while not found:
-            if current.get_valu() == item:
-                found = True
-            else:
-                previous = current
-                current = current.get_next()
-        if previous is None:
-            self.head = current.get_next()
-        else:
-            previous.set_next(current.get_next())
 
 
 # Albero binario di ricerca
@@ -200,7 +232,7 @@ class HashHeap:
 
     def insert(self, key, value):
         hash_index = self._hash(key)
-        self.hash_map[hash_index].add((key, len(self.heap)))
+        self.hash_map[hash_index].add(key, value)
         self.heap.append(value)
         self.max_heapify_parent(len(self.heap) - 1)
 
@@ -262,25 +294,23 @@ class HashHeap:
             return
 
     def swap(self, i, j):
-        key_i = self.heap[i].key
-        hash_index_i = self.hash_map.index(key_i)
-        x = self.hash_map[hash_index_i].search(key_i)
-        x.value = j
+        hash_index_i = self._hash(i)
+        x = self.hash_map[hash_index_i].search(i)
+        if i is not None:
+            x.set_value(hash_index_i, j)
 
-        key_j = self.heap[j].key
-        hash_index_j = self.hash_map.index(key_j)
-        y = self.hash_map[hash_index_j].search(key_j)
-        y.value = i
+        hash_index_j = self._hash(j)
+        y = self.hash_map[hash_index_j].search(j)
+        if j is not None:
+            y.set_value(hash_index_j, i)
 
         self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
 
     def search(self, key):
         hash_index = self._hash(key)
-        current = self.hash_map[hash_index]
-        while current is not None:
-            if self.heap[current.value] == key:
-                return self.heap[current.value]
-            current = current.next
+        node = self.hash_map[hash_index].search(key)
+        if node is not None:
+            return node.get_value()
         return None
 
     def find_maximum(self):
@@ -299,50 +329,45 @@ class HashHeap:
         return min
 
 
-class NodeLinkedListForHash(NodeLinkedList):
+class NodeLinkedListForHash(AbstractNodeLinkedList):
     def __init__(self, key, value):
-        super().__init__(value) #In questo caso però value è la posizione dell' array heap
+        super().__init__(value)  #In questo caso però value è la posizione dell' array heap
         self.key = key
 
     def get_key(self):
         return self.key
 
-    @overrides
-    def set_data(self, key, new_data):
+    def set_value(self, key, new_value, *args, **kwargs):
         if self.key == key:
-            self.data = new_data
+            self.value = new_value
 
-    @overrides
-    def set_next(self, key, new_next):
+    def set_next(self, key, new_next, *args, **kwargs):
         if self.key == key:
             self.next = new_next
 
 
-class LinkedListForHash(LinkedList):
+class LinkedListForHash(AbstractLinkedList):
     def __init__(self):
         super().__init__()
 
-    @overrides
-    def add(self, key, value):
+    def add(self, value, key, *args, **kwargs):
         new_node = NodeLinkedListForHash(key, value)
         new_node.next = self.head
         self.head = new_node
 
-    @overrides
     def search(self, key):
         current = self.head
         while current is not None:
-            if current.key == key:
-                return current
+            if current.get_key() == key:
+                return True
             current = current.next
-        return None
+        return False
 
-    @overrides
     def remove(self, key):
         current = self.head
         previous = None
         while current is not None:
-            if current.key == key:
+            if current.get_key() == key:
                 if previous is not None:
                     previous.next = current.next
                 else:
@@ -361,7 +386,7 @@ def main():
 
     hashHeap.insert(1, 10)
     hashHeap.insert(2, 20)
-    hashHeap.insert(3, 30)
+    #hashHeap.insert(3, 30)
     #hashHeap.insert(3, 40)
 
     linkedList.add(10)
@@ -372,9 +397,10 @@ def main():
     abr.insert(20)
     abr.insert(30)
 
-    print(hashHeap.search(2))
-    print(hashHeap.find_maximum())
-    print(hashHeap.find_minimum())
+    # print(hashHeap.search(2))
+    # print(hashHeap.find_maximum())
+    # print(hashHeap.find_minimum())
+    print('ciao')
 
 
 if __name__ == "__main__":
