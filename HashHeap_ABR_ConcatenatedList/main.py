@@ -219,7 +219,7 @@ class ABR:
 # Hash heap
 
 class HashHeap:
-    def __init__(self, size=10):
+    def __init__(self, size=5):
         self.hash_map = [LinkedListForHash() for _ in range(size)]
         self.heap = []
         self.table_size = size
@@ -232,8 +232,8 @@ class HashHeap:
 
     def insert(self, key, value):
         hash_index = self._hash(key)
-        self.hash_map[hash_index].add(key, value)
-        self.heap.append(value)
+        self.heap.append(HeapNode(key, value))
+        self.hash_map[hash_index].add(key, len(self.heap) - 1)
         self.max_heapify_parent(len(self.heap) - 1)
 
     def delete(self, key):
@@ -241,8 +241,8 @@ class HashHeap:
         prev = None
         current = self.hash_map[hash_index]
         while current:
-            if current.key == key:
-                index = current.value
+            if current.get_key() == key:
+                index = current.get_value()
                 if prev:
                     prev.next = current.next
                 else:
@@ -250,7 +250,7 @@ class HashHeap:
             prev, current = current, current.next
         else:
             return KeyError("Elemento da eliminare con chiave " + key + " non trovato")
-        self.swap(index, len(self.heap) - 1)
+        self.swap(index, len(self.heap))
         del self.heap[-1]
         self.max_heapify_child(index)
 
@@ -260,20 +260,20 @@ class HashHeap:
         while current:
             if current.key == key:
                 index = current.value
-                self.heap[index] = new_value
+                self.heap[index].value = new_value
                 break
             current = current.next
         else:
             return KeyError("Elemento da modificare con chiave " + key + " non trovato")
-        if new_value > self.heap[index]:
+        if new_value > self.heap[index].value:
             self.max_heapify_parent(index)
-        elif new_value < self.heap[index]:
+        elif new_value < self.heap[index].value:
             self.max_heapify_child(index)
 
     def max_heapify_parent(self, i):
         if i > 0:
             p = (i - 1) // 2
-            if self.heap[i] > self.heap[p]:
+            if self.heap[i].value > self.heap[p].value:
                 self.swap(i, p)
                 self.max_heapify_parent(p)
         else:
@@ -283,9 +283,9 @@ class HashHeap:
         l = 2 * i + 1  #Figlio sinistro
         r = 2 * i + 2  #Figlio destro
         max = i
-        if l < len(self.heap) and self.heap[l] > self.heap[i]:
+        if l < len(self.heap) and self.heap[l].value > self.heap[i].value:
             max = l
-        if r < len(self.heap) and self.heap[r] > self.heap[max]:
+        if r < len(self.heap) and self.heap[r].value > self.heap[max].value:
             max = r
         if max != i:
             self.swap(i, max)
@@ -294,15 +294,13 @@ class HashHeap:
             return
 
     def swap(self, i, j):
-        hash_index_i = self._hash(i)
-        x = self.hash_map[hash_index_i].search(i)
-    #      if i is not None:
-     #       x.set_value(hash_index_i, j)
+        hash_index_i = self._hash(self.heap[i].key)
+        x = self.hash_map[hash_index_i].search(self.heap[i].key)
+        x.set_value(self.heap[i].key, j)
 
-        hash_index_j = self._hash(j)
-        y = self.hash_map[hash_index_j].search(j)
-       # if j is not None:
-        #    y.set_value(hash_index_j, i)
+        hash_index_j = self._hash(self.heap[j].key)
+        y = self.hash_map[hash_index_j].search(self.heap[j].key)
+        y.set_value(hash_index_j, i)
 
         self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
 
@@ -310,22 +308,22 @@ class HashHeap:
         hash_index = self._hash(key)
         node = self.hash_map[hash_index].search(key)
         if node is not None:
-            return node.get_key()
+            return self.heap[node.get_value()].value
         return None
 
     def find_maximum(self):
         if not self.heap:
             return None
-        return self.heap[0]
+        return self.heap[0].value
         #Siccome è un max heap il massimo sta alla radice
 
     def find_minimum(self):
         if not self.heap:
             return None
-        min = self.heap[0]
-        for value in self.heap:
-            if value < min:
-                min = value
+        min = self.heap[0].value
+        for node in self.heap:
+            if node.value < min:
+                min = node.value
         return min
 
 
@@ -338,8 +336,10 @@ class NodeLinkedListForHash(AbstractNodeLinkedList):
         return self.key
 
     def set_value(self, key, new_value, *args, **kwargs):
-        if self.key == key:
+        if key == self.key:
             self.value = new_value
+        else:
+            return KeyError("È stato provato di modificare un nodo della lista di cui non è stata insrerita la chiave giusta")
 
     def set_next(self, key, new_next, *args, **kwargs):
         if self.key == key:
@@ -350,7 +350,7 @@ class LinkedListForHash(AbstractLinkedList):
     def __init__(self):
         super().__init__()
 
-    def add(self, value, key, *args, **kwargs):
+    def add(self, key, value, *args, **kwargs):
         new_node = NodeLinkedListForHash(key, value)
         new_node.next = self.head
         self.head = new_node
@@ -358,7 +358,7 @@ class LinkedListForHash(AbstractLinkedList):
     def search(self, key):
         current = self.head
         while current is not None:
-            if current.get_value() == key:
+            if current.get_key() == key:
                 return current
             current = current.next
         return
@@ -378,6 +378,14 @@ class LinkedListForHash(AbstractLinkedList):
         return False
 
 
+#Ho bisogno che l'heap salvi anche la chiave inserita dell'utente
+class HeapNode:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+
+
+
 #Main
 def main():
     hashHeap = HashHeap()
@@ -387,7 +395,17 @@ def main():
     hashHeap.insert(1, 10)
     hashHeap.insert(2, 20)
     hashHeap.insert(3, 30)
-    hashHeap.insert(3, 40)
+    hashHeap.insert(4, 40)
+
+    hashHeap.insert(5, 10)
+    hashHeap.insert(6, 20)
+    hashHeap.insert(7, 30)
+    hashHeap.insert(8, 40)
+
+    hashHeap.insert(9, 10)
+    hashHeap.insert(10, 20)
+    hashHeap.insert(11, 30)
+    hashHeap.insert(12, 40)
 
     linkedList.add(10)
     linkedList.add(20)
