@@ -232,66 +232,38 @@ class HashHeap:
 
     def insert(self, key, value):
         hash_index = self._hash(key)
-        self.heap.append(HeapNode(key, value))
-        self.hash_map[hash_index].add(key, len(self.heap) - 1)
-        self.max_heapify()
+        if self.hash_map[hash_index].search(key) is None:
+            self.heap.append(HeapNode(key, value))
+            self.hash_map[hash_index].add(key, len(self.heap) - 1)
+            self.max_heapify()
+        else:
+            return KeyError("Provato a inserire una chiave già presente")
 
     def delete(self, key):
         hash_index = self._hash(key)
-        prev = None
-        current = self.hash_map[hash_index]
-        while current:
-            if current.get_key() == key:
-                index = current.get_value()
-                if prev:
-                    prev.set_next(prev.get_key(), current.get_next())
-                else:
-                    self.hash_map[index] = current.get_next()
-            prev, current = current, current.get_next()
-        else:
-            return KeyError("Elemento da eliminare con chiave " + key + " non trovato")
-        self.swap(index, len(self.heap))
-        del self.heap[-1]
-        self.max_heapify()
+        index = self.hash_map[hash_index].search(key).get_value()
+        if index:
+            self.swap(index, len(self.heap) - 1)
+            self.hash_map[hash_index].remove(key)
+            del self.heap[-1]
+            self.max_heapify(index, 2)
 
     def update(self, key, new_value):
         hash_index = self._hash(key)
-        current = self.hash_map[hash_index]
-        while current:
-            if current.key == key:
-                index = current.get_value()
+        index = self.hash_map[hash_index].search(key).get_value()
+        if index:
+            if new_value < self.heap[index].value:
                 self.heap[index].value = new_value
-                break
-            current = current.get_next()
+                self.max_heapify(index, 2)
+            elif new_value > self.heap[index].value:
+                self.heap[index].value = new_value
+                self.max_heapify(index, 1)
         else:
             return KeyError("Elemento da modificare con chiave " + key + " non trovato")
-        self.max_heapify()
 
-    def max_heapify_parent(self, i):
-        if i > 0:
-            p = (i - 1) // 2
-            if self.heap[i].value > self.heap[p].value:
-                self.swap(i, p)
-                self.max_heapify()
-        else:
-            return
+    def max_heapify(self, i=None, code=0):
 
-    def max_heapify_child(self, i):
-        l = 2 * i + 1  #Figlio sinistro
-        r = 2 * i + 2  #Figlio destro
-        max = i
-        if l < len(self.heap) and self.heap[l].value > self.heap[i].value:
-            max = l
-        if r < len(self.heap) and self.heap[r].value > self.heap[max].value:
-            max = r
-        if max != i:
-            self.swap(i, max)
-            self.max_heapify()
-        else:
-            return
-
-    def max_heapify(self):
-        def _max_heapify(i):
+        def _max_heapify_child(i):
             l = 2 * i + 1  # Figlio sinistro
             r = 2 * i + 2  # Figlio destro
             max = i
@@ -301,15 +273,40 @@ class HashHeap:
                 max = r
             if max != i:
                 self.swap(i, max)
-                self.max_heapify()
+                _max_heapify_child(max)
             else:
                 return
 
-        _max_heapify(0)
-    #FIXME non funziona perchè si blocca solo al primo
+        def _max_heapify_parent(i):
+            if i > 0:
+                p = (i - 1) // 2
+                if self.heap[i].value > self.heap[p].value:
+                    self.swap(i, p)
+                    _max_heapify_parent(p)
+            else:
+                return
 
+        if code == 0:
+            _max_heapify_parent(len(self.heap) - 1)
+        elif code == 1:
+            _max_heapify_parent(i)
+        elif code == 2:
+            _max_heapify_child(i)
 
-
+    #
+    # def max_heapify(self, i):
+    #     l = 2 * i + 1  #Figlio sinistro
+    #     r = 2 * i + 2  #Figlio destro
+    #     max = i
+    #     if l < len(self.heap) and self.heap[l].value > self.heap[i].value:
+    #         max = l
+    #     if r < len(self.heap) and self.heap[r].value > self.heap[max].value:
+    #         max = r
+    #     if max != i:
+    #         self.swap(i, max)
+    #         self.max_heapify(max)
+    #     else:
+    #         return
 
     def swap(self, i, j):
         hash_index_i = self._hash(self.heap[i].key)
@@ -349,7 +346,6 @@ class HashHeap:
         for node in self.heap:
             print(str(node.value) + ", ", end="")
         print("]")
-
 
 
 class NodeLinkedListForHash(AbstractNodeLinkedList):
@@ -405,11 +401,10 @@ class LinkedListForHash(AbstractLinkedList):
         return False
 
 
-class HeapNode: #È che l'heap salvi anche la chiave inserita dell'utente
+class HeapNode:  #È che l'heap salvi anche la chiave inserita dell'utente
     def __init__(self, key, value):
         self.key = key
         self.value = value
-
 
 
 #Main
@@ -417,21 +412,24 @@ def main():
     hashHeap = HashHeap()
     linkedList = LinkedList()
     abr = ABR()
+    try:
+        hashHeap.insert(1, 10)
+        hashHeap.insert(1, 10)
+        hashHeap.insert(2, 20)
+        hashHeap.insert(3, 30)
+        hashHeap.insert(4, 40)
 
-    hashHeap.insert(1, 10)
-    hashHeap.insert(2, 20)
-    hashHeap.insert(3, 30)
-    hashHeap.insert(4, 40)
+        hashHeap.insert(5, 10)
+        hashHeap.insert(6, 20)
+        hashHeap.insert(7, 30)
+        hashHeap.insert(8, 40)
 
-    hashHeap.insert(5, 10)
-    hashHeap.insert(6, 20)
-    hashHeap.insert(7, 30)
-    hashHeap.insert(8, 40)
-
-    hashHeap.insert(9, 10)
-    hashHeap.insert(10, 20)
-    hashHeap.insert(11, 30)
-    hashHeap.insert(12, 40)
+        hashHeap.insert(9, 10)
+        hashHeap.insert(10, 13)
+        hashHeap.insert(11, 30)
+        hashHeap.insert(12, 40)
+    except KeyError as e:
+        print(e)
 
     linkedList.add(10)
     linkedList.add(20)
@@ -441,11 +439,16 @@ def main():
     abr.insert(20)
     abr.insert(30)
 
+    hashHeap.print()
     print(hashHeap.search(2))
+    hashHeap.update(2, 120)
+    print(hashHeap.search(2))
+    hashHeap.print()
+    hashHeap.delete(10)
+
     print(hashHeap.find_maximum())
     print(hashHeap.find_minimum())
     hashHeap.print()
-
 
 
 if __name__ == "__main__":
