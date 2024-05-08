@@ -296,13 +296,13 @@ class HashHeap:
     def swap(self, i, j):
         hash_index_i = self._hash(i)
         x = self.hash_map[hash_index_i].search(i)
-        if i is not None:
-            x.set_value(hash_index_i, j)
+    #      if i is not None:
+     #       x.set_value(hash_index_i, j)
 
         hash_index_j = self._hash(j)
         y = self.hash_map[hash_index_j].search(j)
-        if j is not None:
-            y.set_value(hash_index_j, i)
+       # if j is not None:
+        #    y.set_value(hash_index_j, i)
 
         self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
 
@@ -310,7 +310,7 @@ class HashHeap:
         hash_index = self._hash(key)
         node = self.hash_map[hash_index].search(key)
         if node is not None:
-            return node.get_value()
+            return node.get_key()
         return None
 
     def find_maximum(self):
@@ -358,10 +358,10 @@ class LinkedListForHash(AbstractLinkedList):
     def search(self, key):
         current = self.head
         while current is not None:
-            if current.get_key() == key:
-                return True
+            if current.get_value() == key:
+                return current
             current = current.next
-        return False
+        return
 
     def remove(self, key):
         current = self.head
@@ -386,8 +386,8 @@ def main():
 
     hashHeap.insert(1, 10)
     hashHeap.insert(2, 20)
-    #hashHeap.insert(3, 30)
-    #hashHeap.insert(3, 40)
+    hashHeap.insert(3, 30)
+    hashHeap.insert(3, 40)
 
     linkedList.add(10)
     linkedList.add(20)
@@ -397,9 +397,9 @@ def main():
     abr.insert(20)
     abr.insert(30)
 
-    # print(hashHeap.search(2))
-    # print(hashHeap.find_maximum())
-    # print(hashHeap.find_minimum())
+    print(hashHeap.search(2))
+    print(hashHeap.find_maximum())
+    print(hashHeap.find_minimum())
     print('ciao')
 
 
