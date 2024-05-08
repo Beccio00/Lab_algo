@@ -306,6 +306,8 @@ class HashHeap:
                 return
 
         _max_heapify(0)
+    #FIXME non funziona perchè si blocca solo al primo
+
 
 
 
