@@ -5,8 +5,8 @@ from abc import ABC, abstractmethod
 
 class AbstractNodeLinkedList(ABC):
     def __init__(self, value):
-        self.value = value
-        self.next = None
+        self._value = value
+        self._next = None
 
     @abstractmethod
     def set_value(self, *args, **kwargs):
@@ -17,10 +17,10 @@ class AbstractNodeLinkedList(ABC):
         pass
 
     def get_value(self):
-        return self.value
+        return self._value
 
     def get_next(self):
-        return self.next
+        return self._next
 
 
 class AbstractLinkedList(ABC):
@@ -57,10 +57,10 @@ class NodeLinkedList(AbstractNodeLinkedList):
         super().__init__(value)
 
     def set_value(self, new_value, *args, **kwargs):
-        self.value = new_value
+        self._value = new_value
 
     def set_next(self, new_next, *args, **kwargs):
-        self.next = new_next
+        self._next = new_next
 
 
 class LinkedList(AbstractLinkedList):
@@ -234,7 +234,7 @@ class HashHeap:
         hash_index = self._hash(key)
         self.heap.append(HeapNode(key, value))
         self.hash_map[hash_index].add(key, len(self.heap) - 1)
-        self.max_heapify_parent(len(self.heap) - 1)
+        self.max_heapify()
 
     def delete(self, key):
         hash_index = self._hash(key)
@@ -244,38 +244,35 @@ class HashHeap:
             if current.get_key() == key:
                 index = current.get_value()
                 if prev:
-                    prev.next = current.next
+                    prev.set_next(prev.get_key(), current.get_next())
                 else:
-                    self.hash_map[index] = current.next
-            prev, current = current, current.next
+                    self.hash_map[index] = current.get_next()
+            prev, current = current, current.get_next()
         else:
             return KeyError("Elemento da eliminare con chiave " + key + " non trovato")
         self.swap(index, len(self.heap))
         del self.heap[-1]
-        self.max_heapify_child(index)
+        self.max_heapify()
 
     def update(self, key, new_value):
         hash_index = self._hash(key)
         current = self.hash_map[hash_index]
         while current:
             if current.key == key:
-                index = current.value
+                index = current.get_value()
                 self.heap[index].value = new_value
                 break
-            current = current.next
+            current = current.get_next()
         else:
             return KeyError("Elemento da modificare con chiave " + key + " non trovato")
-        if new_value > self.heap[index].value:
-            self.max_heapify_parent(index)
-        elif new_value < self.heap[index].value:
-            self.max_heapify_child(index)
+        self.max_heapify()
 
     def max_heapify_parent(self, i):
         if i > 0:
             p = (i - 1) // 2
             if self.heap[i].value > self.heap[p].value:
                 self.swap(i, p)
-                self.max_heapify_parent(p)
+                self.max_heapify()
         else:
             return
 
@@ -289,9 +286,28 @@ class HashHeap:
             max = r
         if max != i:
             self.swap(i, max)
-            self.max_heapify_child(max)
+            self.max_heapify()
         else:
             return
+
+    def max_heapify(self):
+        def _max_heapify(i):
+            l = 2 * i + 1  # Figlio sinistro
+            r = 2 * i + 2  # Figlio destro
+            max = i
+            if l < len(self.heap) and self.heap[l].value > self.heap[i].value:
+                max = l
+            if r < len(self.heap) and self.heap[r].value > self.heap[max].value:
+                max = r
+            if max != i:
+                self.swap(i, max)
+                self.max_heapify()
+            else:
+                return
+
+        _max_heapify(0)
+
+
 
     def swap(self, i, j):
         hash_index_i = self._hash(self.heap[i].key)
@@ -300,7 +316,7 @@ class HashHeap:
 
         hash_index_j = self._hash(self.heap[j].key)
         y = self.hash_map[hash_index_j].search(self.heap[j].key)
-        y.set_value(hash_index_j, i)
+        y.set_value(self.heap[j].key, i)
 
         self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
 
@@ -326,6 +342,13 @@ class HashHeap:
                 min = node.value
         return min
 
+    def print(self):
+        print("Heap: [", end="")
+        for node in self.heap:
+            print(str(node.value) + ", ", end="")
+        print("]")
+
+
 
 class NodeLinkedListForHash(AbstractNodeLinkedList):
     def __init__(self, key, value):
@@ -337,13 +360,15 @@ class NodeLinkedListForHash(AbstractNodeLinkedList):
 
     def set_value(self, key, new_value, *args, **kwargs):
         if key == self.key:
-            self.value = new_value
+            self._value = new_value
         else:
-            return KeyError("È stato provato di modificare un nodo della lista di cui non è stata insrerita la chiave giusta")
+            return KeyError("È stato provato a modificare un nodo nella lista senza aver inserito la chiave corretta.")
 
     def set_next(self, key, new_next, *args, **kwargs):
         if self.key == key:
-            self.next = new_next
+            self._next = new_next
+        else:
+            return KeyError("È stato provato a modificare un nodo nella lista senza aver inserito la chiave corretta.")
 
 
 class LinkedListForHash(AbstractLinkedList):
@@ -352,7 +377,7 @@ class LinkedListForHash(AbstractLinkedList):
 
     def add(self, key, value, *args, **kwargs):
         new_node = NodeLinkedListForHash(key, value)
-        new_node.next = self.head
+        new_node.set_next(key, self.head)
         self.head = new_node
 
     def search(self, key):
@@ -360,7 +385,7 @@ class LinkedListForHash(AbstractLinkedList):
         while current is not None:
             if current.get_key() == key:
                 return current
-            current = current.next
+            current = current.get_next()
         return
 
     def remove(self, key):
@@ -369,17 +394,16 @@ class LinkedListForHash(AbstractLinkedList):
         while current is not None:
             if current.get_key() == key:
                 if previous is not None:
-                    previous.next = current.next
+                    previous.set_next(previous.get_key(), current.get_next())
                 else:
-                    self.head = current.next
+                    self.head = current.get_next()
                 return True
             previous = current
-            current = current.next
+            current = current.get_next()
         return False
 
 
-#Ho bisogno che l'heap salvi anche la chiave inserita dell'utente
-class HeapNode:
+class HeapNode: #È che l'heap salvi anche la chiave inserita dell'utente
     def __init__(self, key, value):
         self.key = key
         self.value = value
@@ -418,7 +442,8 @@ def main():
     print(hashHeap.search(2))
     print(hashHeap.find_maximum())
     print(hashHeap.find_minimum())
-    print('ciao')
+    hashHeap.print()
+
 
 
 if __name__ == "__main__":
