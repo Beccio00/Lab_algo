@@ -1,4 +1,7 @@
 from abc import ABC, abstractmethod
+import random
+import time
+import matplotlib.pyplot as plt
 
 
 # Classi astratte per le liste concatenate
@@ -101,7 +104,7 @@ class LinkedList(AbstractLinkedList):
         current = self.head.get_next()
         max = self.head.get_value()
         while current is not None:
-            if current.get_value > max:
+            if current.get_value() > max:
                 max = current.get_value()
             else:
                 current = current.get_next()
@@ -111,17 +114,19 @@ class LinkedList(AbstractLinkedList):
         current = self.head.get_next()
         min = self.head.get_value()
         while current is not None:
-            if current.get_valu < min:
+            if current.get_value() < min:
                 min = current.get_value()
             else:
                 current = current.get_next()
         return min
 
-    def print_l(self):
+    def print(self):
         current = self.head
+        print("List: ", end="")
         while current is not None:
-            print('..', current.get_value())
+            print('-->', current.get_value(), " ", end="")
             current = current.get_next()
+        print("")
 
 
 # Albero binario di ricerca
@@ -194,12 +199,15 @@ class ABR:
 
     def search(self, key):
         def _search_node(currentNode, key):
-            if key == currentNode.key or currentNode is None:
-                return currentNode
-            elif key < currentNode.key:
-                return _search_node(currentNode.left, key)
+            if currentNode is None:
+                return None
             else:
-                return _search_node(currentNode.right, key)
+                if key == currentNode.key:
+                    return currentNode
+                elif key < currentNode.key:
+                    return _search_node(currentNode.left, key)
+                else:
+                    return _search_node(currentNode.right, key)
 
         return _search_node(self.root, key)
 
@@ -210,10 +218,10 @@ class ABR:
             else:
                 return currentNode
 
-        _find_minimum(self.root)
+        return _find_minimum(self.root)
 
     def find_maximum(self):
-        self._find_maximum(self.root)
+        return self._find_maximum(self.root)
 
     def _find_maximum(self, currentNode):
         if currentNode.right is not None:
@@ -227,11 +235,12 @@ class ABR:
                 return
             if v.left is not None:
                 _inorder(v.left)
-            print(v.key)
+            print("-->", v.key, " ", end="")
             if v.right is not None:
                 _inorder(v.right)
-
+        print("ABR: ", end="")
         _inorder(self.root)
+        print("")
 
 
 # Hash heap
@@ -310,21 +319,6 @@ class HashHeap:
         elif code == 2:
             _max_heapify_child(i)
 
-    #
-    # def max_heapify(self, i):
-    #     l = 2 * i + 1  #Figlio sinistro
-    #     r = 2 * i + 2  #Figlio destro
-    #     max = i
-    #     if l < len(self.heap) and self.heap[l].value > self.heap[i].value:
-    #         max = l
-    #     if r < len(self.heap) and self.heap[r].value > self.heap[max].value:
-    #         max = r
-    #     if max != i:
-    #         self.swap(i, max)
-    #         self.max_heapify(max)
-    #     else:
-    #         return
-
     def swap(self, i, j):
         hash_index_i = self._hash(self.heap[i].key)
         x = self.hash_map[hash_index_i].search(self.heap[i].key)
@@ -361,7 +355,7 @@ class HashHeap:
     def print(self):
         print("Heap: [", end="")
         for node in self.heap:
-            print(str(node.value) + ", ", end="")
+            print(node.value, ", ", end="")
         print("]")
 
 
@@ -426,46 +420,85 @@ class HeapNode:  #È necessario che l'heap salvi anche la chiave inserita dell'u
 
 #Main
 def main():
-    hashHeap = HashHeap()
-    linkedList = LinkedList()
-    abr = ABR()
-    try:
-        hashHeap.insert(1, 10)
-        hashHeap.insert(1, 10)
-        hashHeap.insert(2, 20)
-        hashHeap.insert(3, 30)
-        hashHeap.insert(4, 5)
+    # hashHeap = HashHeap()
+    # linkedList = LinkedList()
+    # abr = ABR()
+    # try:
+    #     hashHeap.insert(1, 10)
+    #     hashHeap.insert(1, 10)
+    #     hashHeap.insert(2, 20)
+    #     hashHeap.insert(3, 30)
+    #     hashHeap.insert(4, 5)
+    #
+    #     hashHeap.insert(5, 10)
+    #     hashHeap.insert(6, 20)
+    #     hashHeap.insert(7, 30)
+    #     hashHeap.insert(8, 40)
+    #
+    #     hashHeap.insert(9, 10)
+    #     hashHeap.insert(10, 13)
+    #     hashHeap.insert(11, 30)
+    #     hashHeap.insert(12, 40)
+    # except KeyError as e:
+    #     print(e)
+    #
+    # linkedList.add(10)
+    # linkedList.add(20)
+    # linkedList.add(30)
+    # linkedList.add(120)
+    #
+    # abr.insert(10)
+    # abr.insert(20)
+    # abr.insert(30)
+    # abr.insert(70)
+    #
+    # hashHeap.print()
+    # print(hashHeap.search(2))
+    # hashHeap.update(2, 120)
+    # print(hashHeap.search(2))
+    # print(hashHeap.search(81))
+    # hashHeap.print()
+    # hashHeap.delete(10)
+    #
+    # print(hashHeap.find_maximum())
+    # print(hashHeap.find_minimum())
+    # hashHeap.print()
+    #
+    # linkedList.print()
+    # print(linkedList.search(11))
+    # print(linkedList.search(120))
+    # print(linkedList.find_maximum())
+    # print(linkedList.find_minimum())
+    # linkedList.remove(10)
+    # linkedList.print()
+    #
+    # abr.inorder()
+    # print(abr.search(70) is not None)
+    # print(abr.search(5) is not None)
+    # print(abr.find_minimum().get())
+    # print(abr.find_maximum().get())
+    # abr.remove(10)
+    # abr.inorder()
+    struct_size = [10, 100, 500, 700, 1000, 1500, 2000]
 
-        hashHeap.insert(5, 10)
-        hashHeap.insert(6, 20)
-        hashHeap.insert(7, 30)
-        hashHeap.insert(8, 40)
+    for size in struct_size:
+        linked_list = LinkedList()
+        abr = ABR()
+        hash_heap = HashHeap()
 
-        hashHeap.insert(9, 10)
-        hashHeap.insert(10, 13)
-        hashHeap.insert(11, 30)
-        hashHeap.insert(12, 40)
-    except KeyError as e:
-        print(e)
+        for i in range(size):
+            linked_list.add(i * random.randint(0, size))
+            abr.insert(i * random.randint(0, size))
+            hash_heap.insert(i, i * random.randint(0, size))
+        linked_list.print()
+        abr.inorder()
+        hash_heap.print()
+        print("")
 
-    linkedList.add(10)
-    linkedList.add(20)
-    linkedList.add(30)
 
-    abr.insert(10)
-    abr.insert(20)
-    abr.insert(30)
 
-    hashHeap.print()
-    print(hashHeap.search(2))
-    hashHeap.update(2, 120)
-    print(hashHeap.search(2))
-    hashHeap.print()
-    hashHeap.delete(10)
 
-    print(hashHeap.find_maximum())
-    print(hashHeap.find_minimum())
-    hashHeap.print()
+
 
 
 if __name__ == "__main__":
