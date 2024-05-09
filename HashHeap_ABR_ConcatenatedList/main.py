@@ -119,7 +119,6 @@ class LinkedList(AbstractLinkedList):
 
     def print_l(self):
         current = self.head
-        previous = None
         while current is not None:
             print('..', current.get_value())
             current = current.get_next()
@@ -140,9 +139,9 @@ class NodeABR:
 
     def get_children(self):
         children = []
-        if (self.left != None):
+        if self.left is not None:
             children.append(self.left)
-        if (self.right != None):
+        if self.right is not None:
             children.append(self.right)
         return children
 
@@ -155,69 +154,87 @@ class ABR:
         self.root = NodeABR(key)
 
     def insert(self, key):
-        if (self.root is None):
+        def _insert_node(currentNode, key):
+            if key <= currentNode.key:
+                if currentNode.left:
+                    _insert_node(currentNode.left, key)
+                else:
+                    currentNode.left = NodeABR(key)
+            elif key > currentNode.key:
+                if currentNode.right:
+                    _insert_node(currentNode.right, key)
+                else:
+                    currentNode.right = NodeABR(key)
+        if self.root is None:
             self.set_root(key)
         else:
-            self.insert_node(self.root, key)
+            _insert_node(self.root, key)
 
-    def insert_node(self, currentNode, key):
-        if (key <= currentNode.key):
-            if (currentNode.left):
-                self.insert_node(currentNode.left, key)
-            else:
-                currentNode.left = NodeABR(key)
-        elif (key > currentNode.key):
-            if (currentNode.right):
-                self.insert_node(currentNode.right, key)
-            else:
-                currentNode.right = NodeABR(key)
+    def remove(self, key):
+        def _remove_node(currentNode, key):
+            if currentNode is None:
+                return currentNode
+            if key < currentNode.key:
+                currentNode.left = _remove_node(currentNode.left, key)
+            elif key > currentNode.key:
+                currentNode.right = _remove_node(currentNode.right, key)
+            elif key == currentNode.key:
+                #nel caso avesse un solo figlio
+                if currentNode.left is None:
+                    return currentNode.right
+                elif currentNode.right is None:
+                    return currentNode.left
+
+                previousNode = self._find_maximum(currentNode.left)
+                currentNode.key = previousNode.key
+                currentNode.left = _remove_node(currentNode.left, previousNode.key)
+            return currentNode
+
+        self.root = _remove_node(self.root, key)
 
     def search(self, key):
-        return self.search_node(self.root, key)
+        def _search_node(currentNode, key):
+            if key == currentNode.key or currentNode is None:
+                return currentNode
+            elif key < currentNode.key:
+                return _search_node(currentNode.left, key)
+            else:
+                return _search_node(currentNode.right, key)
 
-    def search_node(self, currentNode, key):
-        if (currentNode is None):
-            return False
-        elif (key == currentNode.key):
-            return True
-        elif (key < currentNode.key):
-            return self.search_node(currentNode.left, key)
-        else:
-            return self.search_node(currentNode.right, key)
+        return _search_node(self.root, key)
 
     def find_minimum(self):
-        def _searchMinimum(currentNode):
+        def _find_minimum(currentNode):
             if currentNode.left is not None:
-                return _searchMinimum(currentNode.left)
+                return _find_minimum(currentNode.left)
             else:
                 return currentNode
 
-        _searchMinimum(self.root)
+        _find_minimum(self.root)
 
     def find_maximum(self):
-        def _find_maximum(currentNode):
-            if currentNode.right is not None:
-                return _find_maximum(currentNode.right)
-            else:
-                return currentNode
+        self._find_maximum(self.root)
 
-        _find_maximum(self.root)
+    def _find_maximum(self, currentNode):
+        if currentNode.right is not None:
+            return self._find_maximum(currentNode.right)
+        else:
+            return currentNode
 
     def inorder(self):
         def _inorder(v):
-            if (v is None):
+            if v is None:
                 return
-            if (v.left is not None):
+            if v.left is not None:
                 _inorder(v.left)
             print(v.key)
-            if (v.right is not None):
+            if v.right is not None:
                 _inorder(v.right)
 
         _inorder(self.root)
 
 
 # Hash heap
-
 class HashHeap:
     def __init__(self, size=5):
         self.hash_map = [LinkedListForHash() for _ in range(size)]
@@ -401,7 +418,7 @@ class LinkedListForHash(AbstractLinkedList):
         return False
 
 
-class HeapNode:  #È che l'heap salvi anche la chiave inserita dell'utente
+class HeapNode:  #È necessario che l'heap salvi anche la chiave inserita dell'utente
     def __init__(self, key, value):
         self.key = key
         self.value = value
@@ -417,7 +434,7 @@ def main():
         hashHeap.insert(1, 10)
         hashHeap.insert(2, 20)
         hashHeap.insert(3, 30)
-        hashHeap.insert(4, 40)
+        hashHeap.insert(4, 5)
 
         hashHeap.insert(5, 10)
         hashHeap.insert(6, 20)
