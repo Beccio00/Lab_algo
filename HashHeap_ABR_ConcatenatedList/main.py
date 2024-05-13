@@ -1,9 +1,8 @@
 import random
 import sys
 import timeit
-
-import time
 import matplotlib.pyplot as plt
+import pandas as pd
 
 sys.setrecursionlimit(100000)
 
@@ -427,7 +426,6 @@ def main():
         #linked_list.print()
         # abr.inorder()
         # hash_heap.print()
-        print("")
 
         # Calcolo tempi lista concatenata
         insert_list_time = timeit.timeit(
@@ -456,9 +454,10 @@ def main():
         search_hashheap_times.append(search_hashheap_time)
         remove_hashheap_times.append(remove_hashheap_time)
 
-    print(insert_hashheap_times)
-    print(search_hashheap_times)
-    print(remove_hashheap_times)
+    # grafici lista concatenata
+    data_frame = pd.DataFrame({'#Elementi': struct_size, 'Tempo(s)': insert_list_times})
+    # data_frame = data_frame.iloc[1:]
+    print(data_frame)
 
 
 
