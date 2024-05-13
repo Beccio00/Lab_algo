@@ -1,6 +1,11 @@
 import random
+import sys
+import timeit
+
 import time
 import matplotlib.pyplot as plt
+
+sys.setrecursionlimit(100000)
 
 
 # Lista concatenata
@@ -10,11 +15,15 @@ class NodeLinkedList:
         self.next = next
         self.key = key
 
+
 class LinkedList:
     def __init__(self):
         self.head = None
 
     def add(self, key, value):
+        if self.search(key) is not None:
+            print("La chiave ", key, " esiste già")
+            return None
         new_node = NodeLinkedList(key, value, self.head)
         self.head = new_node
 
@@ -24,7 +33,7 @@ class LinkedList:
             if current.key == key:
                 return current
             current = current.next
-        return
+        return None
 
     def remove(self, key):
         current = self.head
@@ -73,8 +82,16 @@ class LinkedList:
             if current.value < min:
                 min = current.value
             else:
-                current = current.value
+                current = current.next
         return min
+
+    def copy(self):
+        copy = LinkedList()
+        current = self.head
+        while current is not None:
+            copy.add(current.key, current.value)
+            current = current.next
+        return copy
 
 
 # Albero binario di ricerca
@@ -95,18 +112,16 @@ class ABR:
 
     def insert(self, key, value):
         def _insert_node(currentNode, key, value):
-            if key < currentNode.key:
+            if key <= currentNode.key:
                 if currentNode.left:
                     _insert_node(currentNode.left, key, value)
                 else:
                     currentNode.left = NodeABR(key, value)
-            elif key > currentNode.key:
+            else:
                 if currentNode.right:
                     _insert_node(currentNode.right, key, value)
                 else:
                     currentNode.right = NodeABR(key, value)
-            else:
-                KeyError("Chiave già inserita")
 
         if self.root is None:
             self.set_root(key, value)
@@ -182,6 +197,20 @@ class ABR:
         _inorder(self.root)
         print("")
 
+    def copy(self):
+        def _copyNode(node):
+            if node is None:
+                return None
+            copyNode = NodeABR(node.key, node.value)
+            copyNode.left = _copyNode(node.left)
+            copyNode.right = _copyNode(node.right)
+            return copyNode
+
+        copy = ABR()
+        if self.root is not None:
+            copy.root = _copyNode(self.root)
+        return copy
+
 
 # Hash heap
 class HashHeap:
@@ -207,12 +236,12 @@ class HashHeap:
 
     def delete(self, key):
         hash_index = self._hash(key)
-        index = self.hash_map[hash_index].search(key).value
-        if index:
-            self.swap(index, len(self.heap) - 1)
+        node = self.hash_map[hash_index].search(key)
+        if node:
+            self.swap(node.value, len(self.heap) - 1)
             self.hash_map[hash_index].remove(key)
             del self.heap[-1]
-            self.max_heapify(index, 2)
+            self.max_heapify(node.value, 2)
 
     def update(self, key, new_value):
         hash_index = self._hash(key)
@@ -225,7 +254,7 @@ class HashHeap:
                 self.heap[index].value = new_value
                 self.max_heapify(index, 1)
         else:
-            return KeyError("Elemento da modificare con chiave " + key + " non trovato")
+            return print("Elemento da modificare con chiave " + key + " non trovato")
 
     def max_heapify(self, i=None, code=0):
 
@@ -274,7 +303,7 @@ class HashHeap:
         hash_index = self._hash(key)
         node = self.hash_map[hash_index].search(key)
         if node is not None:
-            return self.heap[node.value].value
+            return self.heap[node.value]
         return None
 
     def find_maximum(self):
@@ -297,6 +326,12 @@ class HashHeap:
         for node in self.heap:
             print(node.value, ", ", end="")
         print("]")
+
+    def copy(self):
+        hashHeap_copy = HashHeap(self.table_size)
+        for node in self.heap:
+            hashHeap_copy.insert(node.key, node.value)
+        return hashHeap_copy
 
 
 class HeapNode:
@@ -329,15 +364,15 @@ def main():
     # except KeyError as e:
     #     print(e)
     #
-    # linkedList.add(10)
-    # linkedList.add(20)
-    # linkedList.add(30)
-    # linkedList.add(120)
+    # linkedList.add(1, 10)
+    # linkedList.add(2, 20)
+    # linkedList.add(3, 30)
+    # linkedList.add(4, 120)
     #
-    # abr.insert(10)
-    # abr.insert(20)
-    # abr.insert(30)
-    # abr.insert(70)
+    # abr.insert(1, 10)
+    # abr.insert(2, 20)
+    # abr.insert(3, 30)
+    # abr.insert(4, 70)
     #
     # hashHeap.print()
     # print(hashHeap.search(2))
@@ -352,35 +387,79 @@ def main():
     # hashHeap.print()
     #
     # linkedList.print()
-    # print(linkedList.search(11))
-    # print(linkedList.search(120))
+    # print(linkedList.search(4))
+    # print(linkedList.search(7))
     # print(linkedList.find_maximum())
     # print(linkedList.find_minimum())
     # linkedList.remove(10)
     # linkedList.print()
     #
     # abr.inorder()
-    # print(abr.search(70) is not None)
-    # print(abr.search(5) is not None)
-    # print(abr.find_minimum().get())
-    # print(abr.find_maximum().get())
+    # print(abr.search(4) is not None)
+    # print(abr.search(27) is not None)
+    # print(abr.find_minimum().value)
+    # print(abr.find_maximum().value)
     # abr.remove(10)
     # abr.inorder()
-    struct_size = [10, 100, 500, 700, 1000, 1500, 2000]
+    struct_size = [10, 250, 500, 750, 1000, 1250, 1500, 1750, 2000]
+
+    insert_list_times = []
+    search_list_times = []
+    remove_list_times = []
+
+    insert_abr_times = []
+    search_abr_times = []
+    remove_abr_times = []
+
+    insert_hashheap_times = []
+    search_hashheap_times = []
+    remove_hashheap_times = []
 
     for size in struct_size:
         linked_list = LinkedList()
         abr = ABR()
         hash_heap = HashHeap()
-
         for i in range(size):
-            linked_list.add(i, i * random.randint(0, size))
-            abr.insert(i, i * random.randint(0, size))
-            hash_heap.insert(i, i * random.randint(0, size))
-        linked_list.print()
-        abr.inorder()
-        hash_heap.print()
+            linked_list.add(i, random.randint(0, size))
+            abr.insert(i, random.randint(0, size))
+            hash_heap.insert(i, random.randint(0, size))
+
+        #linked_list.print()
+        # abr.inorder()
+        # hash_heap.print()
         print("")
+
+        # Calcolo tempi lista concatenata
+        insert_list_time = timeit.timeit(
+            lambda: linked_list.copy().add(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
+        search_list_time = timeit.timeit(lambda: linked_list.search(random.randint(0, size)), number=5)
+        remove_list_time = timeit.timeit(lambda: linked_list.remove(random.randint(0, size)), number=5)
+        insert_list_times.append(insert_list_time)
+        search_list_times.append(search_list_time)
+        remove_list_times.append(remove_list_time)
+
+        # Calcolo tempi albero binario di ricerca
+        insert_abr_time = timeit.timeit(
+            lambda: abr.copy().insert(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
+        search_abr_time = timeit.timeit(lambda: abr.search(random.randint(0, size)), number=5)
+        remove_abr_time = timeit.timeit(lambda: abr.remove(random.randint(0, size)), number=5)
+        insert_abr_times.append(insert_abr_time)
+        search_abr_times.append(search_abr_time)
+        remove_abr_times.append(remove_abr_time)
+
+        i = 100
+        # Calcolo tempi hash heap
+        insert_hashheap_time = timeit.timeit(lambda: hash_heap.copy().insert(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
+        search_hashheap_time = timeit.timeit(lambda: hash_heap.search(random.randint(0, size)), number=5)
+        remove_hashheap_time = timeit.timeit(lambda: hash_heap.delete(random.randint(0, size)), number=5)
+        insert_hashheap_times.append(insert_hashheap_time)
+        search_hashheap_times.append(search_hashheap_time)
+        remove_hashheap_times.append(remove_hashheap_time)
+
+    print(insert_hashheap_times)
+    print(search_hashheap_times)
+    print(remove_hashheap_times)
+
 
 
 if __name__ == "__main__":
