@@ -423,10 +423,6 @@ def main():
             abr.insert(i, random.randint(0, size))
             hash_heap.insert(i, random.randint(0, size))
 
-        # linked_list.print()
-        # abr.inorder()
-        # hash_heap.print()
-
         # Calcolo tempi lista concatenata
         insert_list_time = timeit.timeit(
             lambda: linked_list.copy().add(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
@@ -573,7 +569,7 @@ def main():
     plt.axis('off')
     plt.savefig('remove_abr_table.png')
     plt.close()
-    
+
     # Grafici alberi binari di ricerca
     plt.plot(struct_size, insert_abr_times, label='Prestazioni inserimento albero binario di ricerca', marker='o')
     plt.xlabel("# di elementi nell'albero")
@@ -666,11 +662,6 @@ def main():
     plt.legend()
     plt.savefig('remove_hashheap_plot.png')
     plt.close()
-
-
-
-
-
 
 
 if __name__ == "__main__":
