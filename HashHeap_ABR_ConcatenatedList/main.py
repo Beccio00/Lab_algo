@@ -525,6 +525,77 @@ def main():
     plt.savefig('remove_list_plot.png')
     plt.close()
 
+    # Tabelle Alberi binari di ricerca
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': insert_abr_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 3.5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella inserimento albero binario di ricerca', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('insert_abr_table.png')
+    plt.close()
+
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': search_abr_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 3.5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella ricerca albero binario di ricerca', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('search_abr_table.png')
+    plt.close()
+
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': remove_abr_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 3.5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella eliminazione albero binario di ricerca', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('remove_abr_table.png')
+    plt.close()
+    
+    # Grafici alberi binari di ricerca
+    plt.plot(struct_size, insert_abr_times, label='Prestazioni inserimento albero binario di ricerca', marker='o')
+    plt.xlabel("# di elementi nell'albero")
+    plt.ylabel('Tempo medio (s)')
+    plt.legend()
+    plt.savefig('insert_abr_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, search_abr_times, label='Prestazioni ricerca albero binario di ricerca', marker='o')
+    plt.xlabel("# di elemnti nell'albero")
+    plt.ylabel('Tempo medio (s)')
+    plt.legend()
+    plt.savefig('search_abr_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, remove_abr_times, label='Prestazioni eliminazione albero binario di ricerca', marker='o')
+    plt.xlabel("# di elemnti nell'albero")
+    plt.ylabel('Tempo medio (s)')
+    plt.legend()
+    plt.savefig('remove_abr_plot.png')
+    plt.close()
+
 
 
 
