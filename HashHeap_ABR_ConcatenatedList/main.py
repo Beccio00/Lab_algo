@@ -423,6 +423,7 @@ def main():
             abr.insert(i, random.randint(0, size))
             hash_heap.insert(i, random.randint(0, size))
 
+        #TODO far si che la coppia sia salvata in una variabile
         # Calcolo tempi lista concatenata
         insert_list_time = timeit.timeit(
             lambda: linked_list.copy().add(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
