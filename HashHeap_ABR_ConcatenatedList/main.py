@@ -503,6 +503,32 @@ def main():
     plt.savefig('remove_list_table.png')
     plt.close()
 
+    # Grafici lista concatenata
+    plt.plot(struct_size, insert_list_times, label='Prestazioni inserimento lista concatenata', marker='o')
+    plt.xlabel('Dimensione della lista')
+    plt.ylabel('Tempo medio (s)')
+    plt.legend()
+    plt.savefig('insert_list_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, search_list_times, label='Prestazioni ricerca lista concatenata', marker='o')
+    plt.xlabel('Dimensione della lista')
+    plt.ylabel('Tempo medio (s)')
+    plt.legend()
+    plt.savefig('search_list_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, remove_list_times, label='Prestazioni eliminazione lista concatenata', marker='o')
+    plt.xlabel('Dimensione della lista')
+    plt.ylabel('Tempo medio (s)')
+    plt.legend()
+    plt.savefig('remove_list_plot.png')
+    plt.close()
+
+
+
+
+
 
 
 
