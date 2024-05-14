@@ -583,21 +583,89 @@ def main():
     plt.close()
 
     plt.plot(struct_size, search_abr_times, label='Prestazioni ricerca albero binario di ricerca', marker='o')
-    plt.xlabel("# di elemnti nell'albero")
+    plt.xlabel("# di elementi nell'albero")
     plt.ylabel('Tempo medio (s)')
     plt.legend()
     plt.savefig('search_abr_plot.png')
     plt.close()
 
     plt.plot(struct_size, remove_abr_times, label='Prestazioni eliminazione albero binario di ricerca', marker='o')
-    plt.xlabel("# di elemnti nell'albero")
+    plt.xlabel("# di elementi nell'albero")
     plt.ylabel('Tempo medio (s)')
     plt.legend()
     plt.savefig('remove_abr_plot.png')
     plt.close()
 
+    # Tabelle HashHeap
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': insert_hashheap_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 3.5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella inserimento hash heap', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('insert_hashheap_table.png')
+    plt.close()
 
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': search_hashheap_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 3.5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella ricerca hash heap', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('search_hashheap_table.png')
+    plt.close()
 
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': remove_hashheap_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 3.5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella eliminazione hash heap', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('remove_heahheap_table.png')
+    plt.close()
+
+    # Grafici hash heap
+    plt.plot(struct_size, insert_abr_times, label='Prestazioni inserimento hash heap', marker='o')
+    plt.xlabel("# di elementi nel hashheap")
+    plt.ylabel('Tempo medio (s)')
+    plt.legend()
+    plt.savefig('insert_hashheap_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, search_abr_times, label='Prestazioni ricerca hash heap', marker='o')
+    plt.xlabel("# di elementi nel hash heap")
+    plt.ylabel('Tempo medio (s)')
+    plt.legend()
+    plt.savefig('search_hashheap_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, remove_abr_times, label='Prestazioni eliminazione hash heap', marker='o')
+    plt.xlabel("# di elementi nel hash heap")
+    plt.ylabel('Tempo medio (s)')
+    plt.legend()
+    plt.savefig('remove_hashheap_plot.png')
+    plt.close()
 
 
 
