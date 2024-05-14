@@ -136,7 +136,7 @@ class ABR:
             elif key > currentNode.key:
                 currentNode.right = _remove_node(currentNode.right, key)
             elif key == currentNode.key:
-                #nel caso avesse un solo figlio
+                # nel caso avesse un solo figlio
                 if currentNode.left is None:
                     return currentNode.right
                 elif currentNode.right is None:
@@ -219,7 +219,7 @@ class HashHeap:
         self.table_size = size
 
     def _hash(self, key):
-        #scelgo A come secondo Knuth
+        # scelgo A come secondo Knuth
         A = 0.61803398875
         hash_key = int(self.table_size * ((float(key) * A) % 1))
         return hash_key
@@ -309,7 +309,7 @@ class HashHeap:
         if not self.heap:
             return None
         return self.heap[0].value
-        #Siccome è un max heap il massimo sta alla radice
+        # Siccome è un max heap il massimo sta alla radice
 
     def find_minimum(self):
         if not self.heap:
@@ -339,7 +339,7 @@ class HeapNode:
         self.value = value
 
 
-#Main
+# Main
 def main():
     # hashHeap = HashHeap()
     # linkedList = LinkedList()
@@ -423,7 +423,7 @@ def main():
             abr.insert(i, random.randint(0, size))
             hash_heap.insert(i, random.randint(0, size))
 
-        #linked_list.print()
+        # linked_list.print()
         # abr.inorder()
         # hash_heap.print()
 
@@ -445,19 +445,66 @@ def main():
         search_abr_times.append(search_abr_time)
         remove_abr_times.append(remove_abr_time)
 
-        i = 100
         # Calcolo tempi hash heap
-        insert_hashheap_time = timeit.timeit(lambda: hash_heap.copy().insert(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
+        insert_hashheap_time = timeit.timeit(
+            lambda: hash_heap.copy().insert(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
         search_hashheap_time = timeit.timeit(lambda: hash_heap.search(random.randint(0, size)), number=5)
         remove_hashheap_time = timeit.timeit(lambda: hash_heap.delete(random.randint(0, size)), number=5)
         insert_hashheap_times.append(insert_hashheap_time)
         search_hashheap_times.append(search_hashheap_time)
         remove_hashheap_times.append(remove_hashheap_time)
 
-    # grafici lista concatenata
-    data_frame = pd.DataFrame({'#Elementi': struct_size, 'Tempo(s)': insert_list_times})
-    # data_frame = data_frame.iloc[1:]
-    print(data_frame)
+    # tabelle lista concatenata
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': insert_list_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 3.5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella inserimento lista cancatenata', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('insert_list_table.png')
+    plt.close()
+
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': search_list_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 3.5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella ricerca lista cancatenata', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('search_list_table.png')
+    plt.close()
+
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': remove_list_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 3.5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella eliminazione lista cancatenata', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('remove_list_table.png')
+    plt.close()
+
+
+
 
 
 
