@@ -424,8 +424,9 @@ def main():
             hash_heap.insert(i, random.randint(0, size))
 
         # Calcolo tempi lista concatenata
+        list_copy = linked_list.copy()
         insert_list_time = timeit.timeit(
-            lambda: linked_list.copy().add(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
+            lambda: list_copy.add(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
         search_list_time = timeit.timeit(lambda: linked_list.search(random.randint(0, size)), number=5)
         remove_list_time = timeit.timeit(lambda: linked_list.remove(random.randint(0, size)), number=5)
         insert_list_times.append(insert_list_time)
@@ -433,8 +434,9 @@ def main():
         remove_list_times.append(remove_list_time)
 
         # Calcolo tempi albero binario di ricerca
+        abr_copy = abr.copy()
         insert_abr_time = timeit.timeit(
-            lambda: abr.copy().insert(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
+            lambda: abr_copy.insert(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
         search_abr_time = timeit.timeit(lambda: abr.search(random.randint(0, size)), number=5)
         remove_abr_time = timeit.timeit(lambda: abr.remove(random.randint(0, size)), number=5)
         insert_abr_times.append(insert_abr_time)
@@ -442,8 +444,9 @@ def main():
         remove_abr_times.append(remove_abr_time)
 
         # Calcolo tempi hash heap
+        hash_heap_copy = hash_heap.copy()
         insert_hashheap_time = timeit.timeit(
-            lambda: hash_heap.copy().insert(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
+            lambda: hash_heap_copy.insert(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
         search_hashheap_time = timeit.timeit(lambda: hash_heap.search(random.randint(0, size)), number=5)
         remove_hashheap_time = timeit.timeit(lambda: hash_heap.delete(random.randint(0, size)), number=5)
         insert_hashheap_times.append(insert_hashheap_time)
@@ -642,14 +645,14 @@ def main():
     plt.close()
 
     # Grafici hash heap
-    plt.plot(struct_size, insert_abr_times, label='Prestazioni inserimento hash heap', marker='o')
+    plt.plot(struct_size, insert_hashheap_times, label='Prestazioni inserimento hash heap', marker='o')
     plt.xlabel("# di elementi nel hashheap")
     plt.ylabel('Tempo medio (s)')
     plt.legend()
     plt.savefig('insert_hashheap_plot.png')
     plt.close()
 
-    plt.plot(struct_size, search_abr_times, label='Prestazioni ricerca hash heap', marker='o')
+    plt.plot(struct_size, search_hashheap_times, label='Prestazioni ricerca hash heap', marker='o')
     plt.xlabel("# di elementi nel hash heap")
     plt.ylabel('Tempo medio (s)')
     plt.legend()
