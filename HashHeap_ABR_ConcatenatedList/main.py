@@ -91,17 +91,18 @@ class ABR:
 
     def insert(self, key, value):
         def _insert_node(currentNode, key, value):
-            if key <= currentNode.key:
+            if key < currentNode.key:
                 if currentNode.left:
                     _insert_node(currentNode.left, key, value)
                 else:
                     currentNode.left = NodeABR(key, value)
-            else:
+            elif key > currentNode.key:
                 if currentNode.right:
                     _insert_node(currentNode.right, key, value)
                 else:
                     currentNode.right = NodeABR(key, value)
-
+            else:
+                print("La chiave ", key, " è già presente nell'albero")
         if self.root is None:
             self.set_root(key, value)
         else:
@@ -172,10 +173,16 @@ class ABR:
             copy.root = _copyNode(self.root)
         return copy
 
+    def _find_maximum(self, currentNode):
+        if currentNode .right is not None:
+            return self._find_maximum(currentNode.right)
+        else:
+            return currentNode
+
 
 # Hash 
 class Hash:
-    def __init__(self, size=5):
+    def __init__(self, size=100):
         self.hash_map = [LinkedList() for _ in range(size)]
         self.table_size = size
 
@@ -215,7 +222,7 @@ class Hash:
         for i in range(self.table_size):
             currentNode = self.hash_map[i].head
             while currentNode is not None:
-                print("{ " + str(currentNode.key) + ": " + str(currentNode.value) + "}", end="")
+                print("{ " + str(currentNode.key) + ": " + str(currentNode.value) + "} ", end="")
                 currentNode = currentNode.next
         print()
 
@@ -232,324 +239,333 @@ class Hash:
 
 # Main
 def main():
-    hash = Hash()
-    linkedList = LinkedList()
-    abr = ABR()
-    try:
-        hash.insert(1, 10)
-        hash.insert(1, 10)
-        hash.insert(2, 20)
-        hash.insert(3, 30)
-        hash.insert(4, 5)
+    # hash = Hash()
+    # linkedList = LinkedList()
+    # abr = ABR()
+    # try:
+    #     hash.insert(1, 10)
+    #     hash.insert(1, 10)
+    #     hash.insert(2, 20)
+    #     hash.insert(3, 30)
+    #     hash.insert(4, 5)
+    #
+    #     hash.insert(5, 10)
+    #     hash.insert(6, 20)
+    #     hash.insert(7, 30)
+    #     hash.insert(8, 40)
+    #
+    #     hash.insert(9, 10)
+    #     hash.insert(10, 13)
+    #     hash.insert(11, 30)
+    #     hash.insert(12, 40)
+    # except KeyError as e:
+    #     print(e)
+    #
+    # linkedList.add(1, 10)
+    # linkedList.add(2, 20)
+    # linkedList.add(3, 30)
+    # linkedList.add(4, 120)
+    #
+    # abr.insert(1, 10)
+    # abr.insert(2, 20)
+    # abr.insert(3, 30)
+    # abr.insert(4, 70)
+    #
+    # hash.print()
+    # print(hash.search(2).value)
+    # hash.update(2, 120)
+    # print(hash.search(2).value)
+    # print(hash.search(81))
+    # hash.print()
+    # hash.delete(10)
+    # hash.print()
+    #
+    # linkedList.print()
+    # print(linkedList.search(4))
+    # print(linkedList.search(7))
+    # linkedList.remove(10)
+    # linkedList.print()
+    #
+    # abr.inorder()
+    # print(abr.search(4) is not None)
+    # print(abr.search(27) is not None)
+    # abr.remove(10)
+    # abr.inorder()
+    struct_size = [10, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000]
 
-        hash.insert(5, 10)
-        hash.insert(6, 20)
-        hash.insert(7, 30)
-        hash.insert(8, 40)
+    insert_list_times = []
+    search_list_times = []
+    remove_list_times = []
 
-        hash.insert(9, 10)
-        hash.insert(10, 13)
-        hash.insert(11, 30)
-        hash.insert(12, 40)
-    except KeyError as e:
-        print(e)
+    insert_abr_times = []
+    search_abr_times = []
+    remove_abr_times = []
 
-    linkedList.add(1, 10)
-    linkedList.add(2, 20)
-    linkedList.add(3, 30)
-    linkedList.add(4, 120)
+    insert_hash_times = []
+    search_hash_times = []
+    remove_hash_times = []
 
-    abr.insert(1, 10)
-    abr.insert(2, 20)
-    abr.insert(3, 30)
-    abr.insert(4, 70)
+    for size in struct_size:
+        linked_list = LinkedList()
+        abr = ABR()
+        hash_heap = Hash()
+        for i in range(size):
+            linked_list.add(i, random.randint(0, size))
+            abr.insert(i, random.randint(0, size))
+            hash_heap.insert(i, random.randint(0, size))
 
-    hash.print()
-    print(hash.search(2))
-    hash.update(2, 120)
-    print(hash.search(2))
-    print(hash.search(81))
-    hash.print()
-    hash.delete(10)
-    hash.print()
+        # Calcolo tempi lista concatenata
+        list_copy = linked_list.copy()
+        insert_list_time = timeit.timeit(
+            lambda: list_copy.add(random.randint(size + 1, size + 10000), random.randint(0, size)), number=5)
+        search_list_time = timeit.timeit(lambda: linked_list.search(random.randint(0, size)), number=5)
+        remove_list_time = timeit.timeit(lambda: linked_list.remove(random.randint(0, size)), number=5)
+        insert_list_times.append(insert_list_time)
+        search_list_times.append(search_list_time)
+        remove_list_times.append(remove_list_time)
 
-    linkedList.print()
-    print(linkedList.search(4))
-    print(linkedList.search(7))
-    linkedList.remove(10)
-    linkedList.print()
+        # Calcolo tempi albero binario di ricerca
+        abr_copy = abr.copy()
+        insert_abr_time = timeit.timeit(
+            lambda: abr_copy.insert(random.randint(size + 1, size + 10000), random.randint(0, size)), number=5)
+        search_abr_time = timeit.timeit(lambda: abr.search(random.randint(0, size)), number=5)
+        remove_abr_time = timeit.timeit(lambda: abr.remove(random.randint(0, size)), number=5)
+        insert_abr_times.append(insert_abr_time)
+        search_abr_times.append(search_abr_time)
+        remove_abr_times.append(remove_abr_time)
 
-    abr.inorder()
-    print(abr.search(4) is not None)
-    print(abr.search(27) is not None)
-    abr.remove(10)
-    abr.inorder()
-#     struct_size = [10, 250, 500, 750, 1000, 1250, 1500, 1750, 2000]
-#
-#     insert_list_times = []
-#     search_list_times = []
-#     remove_list_times = []
-#
-#     insert_abr_times = []
-#     search_abr_times = []
-#     remove_abr_times = []
-#
-#     insert_hash_times = []
-#     search_hash_times = []
-#     remove_hash_times = []
-#
-#     for size in struct_size:
-#         linked_list = LinkedList()
-#         abr = ABR()
-#         hash_heap = Hash()
-#         for i in range(size):
-#             linked_list.add(i, random.randint(0, size))
-#             abr.insert(i, random.randint(0, size))
-#             hash_heap.insert(i, random.randint(0, size))
-#
-#         # Calcolo tempi lista concatenata
-#         list_copy = linked_list.copy()
-#         insert_list_time = timeit.timeit(
-#             lambda: list_copy.add(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
-#         search_list_time = timeit.timeit(lambda: linked_list.search(random.randint(0, size)), number=5)
-#         remove_list_time = timeit.timeit(lambda: linked_list.remove(random.randint(0, size)), number=5)
-#         insert_list_times.append(insert_list_time)
-#         search_list_times.append(search_list_time)
-#         remove_list_times.append(remove_list_time)
-#
-#         # Calcolo tempi albero binario di ricerca
-#         abr_copy = abr.copy()
-#         insert_abr_time = timeit.timeit(
-#             lambda: abr_copy.insert(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
-#         search_abr_time = timeit.timeit(lambda: abr.search(random.randint(0, size)), number=5)
-#         remove_abr_time = timeit.timeit(lambda: abr.remove(random.randint(0, size)), number=5)
-#         insert_abr_times.append(insert_abr_time)
-#         search_abr_times.append(search_abr_time)
-#         remove_abr_times.append(remove_abr_time)
-#
-#         # Calcolo tempi hash heap
-#         hash_heap_copy = hash_heap.copy()
-#         insert_hashheap_time = timeit.timeit(
-#             lambda: hash_heap_copy.insert(random.randint(size + 1, size + 100), random.randint(0, size)), number=5)
-#         search_hash_time = timeit.timeit(lambda: hash_heap.search(random.randint(0, size)), number=5)
-#         remove_hash_time = timeit.timeit(lambda: hash_heap.delete(random.randint(0, size)), number=5)
-#         insert_hash_times.append(insert_hash_time)
-#         search_hash_times.append(search_hash_time)
-#         remove_hash_times.append(remove_hash_time)
-#
-#     # tabelle lista concatenata
-#     data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': insert_list_times})
-#     data_frame = data_frame.iloc[1:]
-#     data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
-#         lambda x: '{:.4e}'.format(x))
-#     plt.figure(figsize=(6.5, 3.5))
-#     plt.table(cellText=data_frame.values,
-#               colLabels=data_frame.columns,
-#               loc='center',
-#               cellLoc='center',
-#               rowLoc='center')
-#     plt.title('Tabella inserimento lista cancatenata', fontsize=18, fontweight='bold')
-#     plt.axis('tight')
-#     plt.axis('off')
-#     plt.savefig('insert_list_table.png')
-#     plt.close()
-#
-#     data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': search_list_times})
-#     data_frame = data_frame.iloc[1:]
-#     data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
-#         lambda x: '{:.4e}'.format(x))
-#     plt.figure(figsize=(6.5, 3.5))
-#     plt.table(cellText=data_frame.values,
-#               colLabels=data_frame.columns,
-#               loc='center',
-#               cellLoc='center',
-#               rowLoc='center')
-#     plt.title('Tabella ricerca lista cancatenata', fontsize=18, fontweight='bold')
-#     plt.axis('tight')
-#     plt.axis('off')
-#     plt.savefig('search_list_table.png')
-#     plt.close()
-#
-#     data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': remove_list_times})
-#     data_frame = data_frame.iloc[1:]
-#     data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
-#         lambda x: '{:.4e}'.format(x))
-#     plt.figure(figsize=(6.5, 3.5))
-#     plt.table(cellText=data_frame.values,
-#               colLabels=data_frame.columns,
-#               loc='center',
-#               cellLoc='center',
-#               rowLoc='center')
-#     plt.title('Tabella eliminazione lista cancatenata', fontsize=18, fontweight='bold')
-#     plt.axis('tight')
-#     plt.axis('off')
-#     plt.savefig('remove_list_table.png')
-#     plt.close()
-#
-#     # Grafici lista concatenata
-#     plt.plot(struct_size, insert_list_times, label='Prestazioni inserimento lista concatenata', marker='o')
-#     plt.xlabel('Dimensione della lista')
-#     plt.ylabel('Tempo medio (s)')
-#     plt.legend()
-#     plt.savefig('insert_list_plot.png')
-#     plt.close()
-#
-#     plt.plot(struct_size, search_list_times, label='Prestazioni ricerca lista concatenata', marker='o')
-#     plt.xlabel('Dimensione della lista')
-#     plt.ylabel('Tempo medio (s)')
-#     plt.legend()
-#     plt.savefig('search_list_plot.png')
-#     plt.close()
-#
-#     plt.plot(struct_size, remove_list_times, label='Prestazioni eliminazione lista concatenata', marker='o')
-#     plt.xlabel('Dimensione della lista')
-#     plt.ylabel('Tempo medio (s)')
-#     plt.legend()
-#     plt.savefig('remove_list_plot.png')
-#     plt.close()
-#
-#     # Tabelle Alberi binari di ricerca
-#     data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': insert_abr_times})
-#     data_frame = data_frame.iloc[1:]
-#     data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
-#         lambda x: '{:.4e}'.format(x))
-#     plt.figure(figsize=(6.5, 3.5))
-#     plt.table(cellText=data_frame.values,
-#               colLabels=data_frame.columns,
-#               loc='center',
-#               cellLoc='center',
-#               rowLoc='center')
-#     plt.title('Tabella inserimento albero binario di ricerca', fontsize=18, fontweight='bold')
-#     plt.axis('tight')
-#     plt.axis('off')
-#     plt.savefig('insert_abr_table.png')
-#     plt.close()
-#
-#     data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': search_abr_times})
-#     data_frame = data_frame.iloc[1:]
-#     data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
-#         lambda x: '{:.4e}'.format(x))
-#     plt.figure(figsize=(6.5, 3.5))
-#     plt.table(cellText=data_frame.values,
-#               colLabels=data_frame.columns,
-#               loc='center',
-#               cellLoc='center',
-#               rowLoc='center')
-#     plt.title('Tabella ricerca albero binario di ricerca', fontsize=18, fontweight='bold')
-#     plt.axis('tight')
-#     plt.axis('off')
-#     plt.savefig('search_abr_table.png')
-#     plt.close()
-#
-#     data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': remove_abr_times})
-#     data_frame = data_frame.iloc[1:]
-#     data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
-#         lambda x: '{:.4e}'.format(x))
-#     plt.figure(figsize=(6.5, 3.5))
-#     plt.table(cellText=data_frame.values,
-#               colLabels=data_frame.columns,
-#               loc='center',
-#               cellLoc='center',
-#               rowLoc='center')
-#     plt.title('Tabella eliminazione albero binario di ricerca', fontsize=18, fontweight='bold')
-#     plt.axis('tight')
-#     plt.axis('off')
-#     plt.savefig('remove_abr_table.png')
-#     plt.close()
-#
-#     # Grafici alberi binari di ricerca
-#     plt.plot(struct_size, insert_abr_times, label='Prestazioni inserimento albero binario di ricerca', marker='o')
-#     plt.xlabel("# di elementi nell'albero")
-#     plt.ylabel('Tempo medio (s)')
-#     plt.legend()
-#     plt.savefig('insert_abr_plot.png')
-#     plt.close()
-#
-#     plt.plot(struct_size, search_abr_times, label='Prestazioni ricerca albero binario di ricerca', marker='o')
-#     plt.xlabel("# di elementi nell'albero")
-#     plt.ylabel('Tempo medio (s)')
-#     plt.legend()
-#     plt.savefig('search_abr_plot.png')
-#     plt.close()
-#
-#     plt.plot(struct_size, remove_abr_times, label='Prestazioni eliminazione albero binario di ricerca', marker='o')
-#     plt.xlabel("# di elementi nell'albero")
-#     plt.ylabel('Tempo medio (s)')
-#     plt.legend()
-#     plt.savefig('remove_abr_plot.png')
-#     plt.close()
-#
-#     # Tabelle HashHeap
-#     data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': insert_hash_times})
-#     data_frame = data_frame.iloc[1:]
-#     data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
-#         lambda x: '{:.4e}'.format(x))
-#     plt.figure(figsize=(6.5, 3.5))
-#     plt.table(cellText=data_frame.values,
-#               colLabels=data_frame.columns,
-#               loc='center',
-#               cellLoc='center',
-#               rowLoc='center')
-#     plt.title('Tabella inserimento hash heap', fontsize=18, fontweight='bold')
-#     plt.axis('tight')
-#     plt.axis('off')
-#     plt.savefig('insert_hash_table.png')
-#     plt.close()
-#
-#     data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': search_hash_times})
-#     data_frame = data_frame.iloc[1:]
-#     data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
-#         lambda x: '{:.4e}'.format(x))
-#     plt.figure(figsize=(6.5, 3.5))
-#     plt.table(cellText=data_frame.values,
-#               colLabels=data_frame.columns,
-#               loc='center',
-#               cellLoc='center',
-#               rowLoc='center')
-#     plt.title('Tabella ricerca hash heap', fontsize=18, fontweight='bold')
-#     plt.axis('tight')
-#     plt.axis('off')
-#     plt.savefig('search_hash_table.png')
-#     plt.close()
-#
-#     data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': remove_hash_times})
-#     data_frame = data_frame.iloc[1:]
-#     data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
-#         lambda x: '{:.4e}'.format(x))
-#     plt.figure(figsize=(6.5, 3.5))
-#     plt.table(cellText=data_frame.values,
-#               colLabels=data_frame.columns,
-#               loc='center',
-#               cellLoc='center',
-#               rowLoc='center')
-#     plt.title('Tabella eliminazione hash heap', fontsize=18, fontweight='bold')
-#     plt.axis('tight')
-#     plt.axis('off')
-#     plt.savefig('remove_heahheap_table.png')
-#     plt.close()
-#
-#     # Grafici hash heap
-#     plt.plot(struct_size, insert_hash_times, label='Prestazioni inserimento hash heap', marker='o')
-#     plt.xlabel("# di elementi nel hash")
-#     plt.ylabel('Tempo medio (s)')
-#     plt.legend()
-#     plt.savefig('insert_hash_plot.png')
-#     plt.close()
-#
-#     plt.plot(struct_size, search_hash_times, label='Prestazioni ricerca hash heap', marker='o')
-#     plt.xlabel("# di elementi nel hash heap")
-#     plt.ylabel('Tempo medio (s)')
-#     plt.legend()
-#     plt.savefig('search_hash_plot.png')
-#     plt.close()
-#
-#     plt.plot(struct_size, remove_abr_times, label='Prestazioni eliminazione hash heap', marker='o')
-#     plt.xlabel("# di elementi nel hash heap")
-#     plt.ylabel('Tempo medio (s)')
-#     plt.legend()
-#     plt.savefig('remove_hash_plot.png')
-#     plt.close()
-#
-#
+        # Calcolo tempi hash heap
+        hash_heap_copy = hash_heap.copy()
+        insert_hash_time = timeit.timeit(
+            lambda: hash_heap_copy.insert(random.randint(size + 1, size + 10000), random.randint(0, size)), number=5)
+        search_hash_time = timeit.timeit(lambda: hash_heap.search(random.randint(0, size)), number=5)
+        remove_hash_time = timeit.timeit(lambda: hash_heap.delete(random.randint(0, size)), number=5)
+        insert_hash_times.append(insert_hash_time)
+        search_hash_times.append(search_hash_time)
+        remove_hash_times.append(remove_hash_time)
+
+    # tabelle lista concatenata
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': insert_list_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella inserimento lista cancatenata', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('insert_list_table.png')
+    plt.close()
+
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': search_list_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella ricerca lista cancatenata', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('search_list_table.png')
+    plt.close()
+
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': remove_list_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella eliminazione lista cancatenata', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('remove_list_table.png')
+    plt.close()
+
+    # Grafici lista concatenata
+    plt.plot(struct_size, insert_list_times, label='Prestazioni inserimento lista concatenata', marker='o')
+    plt.xlabel('Dimensione della lista')
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.001)
+    plt.legend()
+    plt.savefig('insert_list_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, search_list_times, label='Prestazioni ricerca lista concatenata', marker='o')
+    plt.xlabel('Dimensione della lista')
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.001)
+    plt.legend()
+    plt.savefig('search_list_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, remove_list_times, label='Prestazioni eliminazione lista concatenata', marker='o')
+    plt.xlabel('Dimensione della lista')
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.001)
+    plt.legend()
+    plt.savefig('remove_list_plot.png')
+    plt.close()
+
+    # Tabelle Alberi binari di ricerca
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': insert_abr_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella inserimento albero binario di ricerca', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('insert_abr_table.png')
+    plt.close()
+
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': search_abr_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella ricerca albero binario di ricerca', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('search_abr_table.png')
+    plt.close()
+
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': remove_abr_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella eliminazione albero binario di ricerca', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('remove_abr_table.png')
+    plt.close()
+
+    # Grafici alberi binari di ricerca
+    plt.plot(struct_size, insert_abr_times, label='Prestazioni inserimento albero binario di ricerca', marker='o')
+    plt.xlabel("# di elementi nell'albero")
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.005)
+    plt.legend()
+    plt.savefig('insert_abr_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, search_abr_times, label='Prestazioni ricerca albero binario di ricerca', marker='o')
+    plt.xlabel("# di elementi nell'albero")
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.005)
+    plt.legend()
+    plt.savefig('search_abr_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, remove_abr_times, label='Prestazioni eliminazione albero binario di ricerca', marker='o')
+    plt.xlabel("# di elementi nell'albero")
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.005)
+    plt.legend()
+    plt.savefig('remove_abr_plot.png')
+    plt.close()
+
+    # Tabelle dell'hash
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': insert_hash_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella inserimento hash', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('insert_hash_table.png')
+    plt.close()
+
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': search_hash_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella ricerca hash', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('search_hash_table.png')
+    plt.close()
+
+    data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': remove_hash_times})
+    data_frame = data_frame.iloc[1:]
+    data_frame['Tempo(s)'] = data_frame['Tempo(s)'].apply(
+        lambda x: '{:.4e}'.format(x))
+    plt.figure(figsize=(6.5, 5))
+    plt.table(cellText=data_frame.values,
+              colLabels=data_frame.columns,
+              loc='center',
+              cellLoc='center',
+              rowLoc='center')
+    plt.title('Tabella eliminazione hash', fontsize=18, fontweight='bold')
+    plt.axis('tight')
+    plt.axis('off')
+    plt.savefig('remove_hash_table.png')
+    plt.close()
+
+    # Grafici hash
+    plt.plot(struct_size, insert_hash_times, label='Prestazioni inserimento hash', marker='o')
+    plt.xlabel("# di elementi nel hash")
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.0001)
+    plt.legend()
+    plt.savefig('insert_hash_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, search_hash_times, label='Prestazioni ricerca hash', marker='o')
+    plt.xlabel("# di elementi nel hash")
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.0001)
+    plt.legend()
+    plt.savefig('search_hash_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, remove_hash_times, label='Prestazioni eliminazione hash', marker='o')
+    plt.xlabel("# di elementi nel hash")
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.0001)
+    plt.legend()
+    plt.savefig('remove_hash_plot.png')
+    plt.close()
+
+
 if __name__ == "__main__":
     main()
