@@ -182,7 +182,7 @@ class ABR:
 
 # Hash 
 class Hash:
-    def __init__(self, size=100):
+    def __init__(self, size=5000):
         self.hash_map = [LinkedList() for _ in range(size)]
         self.table_size = size
 
@@ -291,7 +291,8 @@ def main():
     # print(abr.search(27) is not None)
     # abr.remove(10)
     # abr.inorder()
-    struct_size = [10, 250, 500, 750, 1000, 1250, 1500, 1750, 2000, 2250, 2500, 2750, 3000]
+    struct_size = [1, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500,
+                   9000, 9500, 10000]
 
     insert_list_times = []
     search_list_times = []
@@ -308,17 +309,19 @@ def main():
     for size in struct_size:
         linked_list = LinkedList()
         abr = ABR()
-        hash_heap = Hash()
-        for i in range(size):
+        hash = Hash()
+
+        # Faccio sì che le chiavi siano inseriti all'interno dei dizionari in maniera randomica
+        random_key = random.sample(range(size), size)
+        for i in random_key:
             linked_list.add(i, random.randint(0, size))
             abr.insert(i, random.randint(0, size))
-            hash_heap.insert(i, random.randint(0, size))
+            hash.insert(i, random.randint(0, size))
 
-        #TODO far si che la coppia sia salvata in una variabile
-        # Calcolo tempi lista concatenata
         list_copy = linked_list.copy()
         insert_list_time = timeit.timeit(
-            lambda: list_copy.add(random.randint(size + 1, size + 10000), random.randint(0, size)), number=5)
+            lambda: list_copy.add(random.randint(size + 1, size + 10000), random.randint(0, size)),  number=5)
+
         search_list_time = timeit.timeit(lambda: linked_list.search(random.randint(0, size)), number=5)
         remove_list_time = timeit.timeit(lambda: linked_list.remove(random.randint(0, size)), number=5)
         insert_list_times.append(insert_list_time)
@@ -336,11 +339,11 @@ def main():
         remove_abr_times.append(remove_abr_time)
 
         # Calcolo tempi hash heap
-        hash_heap_copy = hash_heap.copy()
+        hash_copy = hash.copy()
         insert_hash_time = timeit.timeit(
-            lambda: hash_heap_copy.insert(random.randint(size + 1, size + 10000), random.randint(0, size)), number=5)
-        search_hash_time = timeit.timeit(lambda: hash_heap.search(random.randint(0, size)), number=5)
-        remove_hash_time = timeit.timeit(lambda: hash_heap.delete(random.randint(0, size)), number=5)
+            lambda: hash_copy.insert(random.randint(size + 1, size + 10000), random.randint(0, size)), number=5)
+        search_hash_time = timeit.timeit(lambda: hash.search(random.randint(0, size)), number=5)
+        remove_hash_time = timeit.timeit(lambda: hash.delete(random.randint(0, size)), number=5)
         insert_hash_times.append(insert_hash_time)
         search_hash_times.append(search_hash_time)
         remove_hash_times.append(remove_hash_time)
@@ -398,7 +401,6 @@ def main():
     plt.plot(struct_size, insert_list_times, label='Prestazioni inserimento lista concatenata', marker='o')
     plt.xlabel('Dimensione della lista')
     plt.ylabel('Tempo medio (s)')
-    plt.ylim(0, 0.001)
     plt.legend()
     plt.savefig('insert_list_plot.png')
     plt.close()
@@ -406,7 +408,6 @@ def main():
     plt.plot(struct_size, search_list_times, label='Prestazioni ricerca lista concatenata', marker='o')
     plt.xlabel('Dimensione della lista')
     plt.ylabel('Tempo medio (s)')
-    plt.ylim(0, 0.001)
     plt.legend()
     plt.savefig('search_list_plot.png')
     plt.close()
@@ -414,7 +415,6 @@ def main():
     plt.plot(struct_size, remove_list_times, label='Prestazioni eliminazione lista concatenata', marker='o')
     plt.xlabel('Dimensione della lista')
     plt.ylabel('Tempo medio (s)')
-    plt.ylim(0, 0.001)
     plt.legend()
     plt.savefig('remove_list_plot.png')
     plt.close()
@@ -472,7 +472,7 @@ def main():
     plt.plot(struct_size, insert_abr_times, label='Prestazioni inserimento albero binario di ricerca', marker='o')
     plt.xlabel("# di elementi nell'albero")
     plt.ylabel('Tempo medio (s)')
-    plt.ylim(0, 0.005)
+    plt.ylim(0, 0.0001)
     plt.legend()
     plt.savefig('insert_abr_plot.png')
     plt.close()
@@ -480,7 +480,7 @@ def main():
     plt.plot(struct_size, search_abr_times, label='Prestazioni ricerca albero binario di ricerca', marker='o')
     plt.xlabel("# di elementi nell'albero")
     plt.ylabel('Tempo medio (s)')
-    plt.ylim(0, 0.005)
+    plt.ylim(0, 0.0001)
     plt.legend()
     plt.savefig('search_abr_plot.png')
     plt.close()
@@ -488,7 +488,7 @@ def main():
     plt.plot(struct_size, remove_abr_times, label='Prestazioni eliminazione albero binario di ricerca', marker='o')
     plt.xlabel("# di elementi nell'albero")
     plt.ylabel('Tempo medio (s)')
-    plt.ylim(0, 0.005)
+    plt.ylim(0, 0.0001)
     plt.legend()
     plt.savefig('remove_abr_plot.png')
     plt.close()
