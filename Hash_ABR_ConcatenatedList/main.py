@@ -215,7 +215,7 @@ def main():
     for size in struct_size:
         linked_list = LinkedList()
         abr = ABR()
-        hash = Hash(15000)
+        hash = Hash(16384)
 
         # Faccio sì che le chiavi siano inseriti all'interno dei dizionari in maniera randomica altrimenti l'albero
         # binario di ricerca sarebbe sbilanciato
@@ -245,7 +245,7 @@ def main():
         search_abr_times.append(search_abr_time)
         delete_abr_times.append(delete_abr_time)
 
-        # Calcolo tempi hash heap
+        # Calcolo tempi hash
         hash_copy = hash.copy()
         insert_hash_time = timeit.timeit(
             lambda: hash_copy.insert(random.randint(size + 1, size + 10000), random.randint(0, size)), number=5)
