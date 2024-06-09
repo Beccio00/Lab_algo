@@ -269,7 +269,7 @@ def main():
     plt.title('Tabella inserimento lista cancatenata', fontsize=18, fontweight='bold')
     plt.axis('tight')
     plt.axis('off')
-    #plt.savefig('insert_list_table.png')
+    plt.savefig('insert_list_table.png')
     plt.close()
 
     data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': search_list_times})
@@ -304,6 +304,27 @@ def main():
     plt.savefig('delete_list_table.png')
     plt.close()
 
+    # Grafici lista concatenata
+    plt.plot(struct_size, insert_list_times, label='Prestazioni inserimento lista concatenata', marker='o')
+    plt.xlabel('Dimensione della lista')
+    plt.ylabel('Tempo medio (s)')
+    plt.legend()
+    plt.savefig('insert_list_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, search_list_times, label='Prestazioni ricerca lista concatenata', marker='o')
+    plt.xlabel('Dimensione della lista')
+    plt.ylabel('Tempo medio (s)')
+    plt.legend()
+    plt.savefig('search_list_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, delete_list_times, label='Prestazioni eliminazione lista concatenata', marker='o')
+    plt.xlabel('Dimensione della lista')
+    plt.ylabel('Tempo medio (s)')
+    plt.legend()
+    plt.savefig('delete_list_plot.png')
+    plt.close()
 
     # Tabelle Alberi binari di ricerca
     data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': insert_abr_times})
@@ -319,7 +340,7 @@ def main():
     plt.title('Tabella inserimento albero binario di ricerca', fontsize=18, fontweight='bold')
     plt.axis('tight')
     plt.axis('off')
-    #plt.savefig('insert_abr_table.png')
+    plt.savefig('insert_abr_table.png')
     plt.close()
 
     data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': search_abr_times})
@@ -354,6 +375,31 @@ def main():
     plt.savefig('delete_abr_table.png')
     plt.close()
 
+    # Grafici alberi binari di ricerca
+    plt.plot(struct_size, insert_abr_times, label='Prestazioni inserimento albero binario di ricerca', marker='o')
+    plt.xlabel("# di elementi nell'albero")
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.0001)
+    plt.legend()
+    plt.savefig('insert_abr_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, search_abr_times, label='Prestazioni ricerca albero binario di ricerca', marker='o')
+    plt.xlabel("# di elementi nell'albero")
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.0001)
+    plt.legend()
+    plt.savefig('search_abr_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, delete_abr_times, label='Prestazioni eliminazione albero binario di ricerca', marker='o')
+    plt.xlabel("# di elementi nell'albero")
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.0001)
+    plt.legend()
+    plt.savefig('delete_abr_plot.png')
+    plt.close()
+
     # Tabelle dell'hash
     data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': insert_hash_times})
     data_frame = data_frame.iloc[1:]
@@ -368,7 +414,7 @@ def main():
     plt.title('Tabella inserimento hash', fontsize=18, fontweight='bold')
     plt.axis('tight')
     plt.axis('off')
-    #plt.savefig('insert_hash_table.png')
+    plt.savefig('insert_hash_table.png')
     plt.close()
 
     data_frame = pd.DataFrame({'# Elementi': struct_size, 'Tempo(s)': search_hash_times})
@@ -403,6 +449,30 @@ def main():
     plt.savefig('delete_hash_table.png')
     plt.close()
 
+    # Grafici hash
+    plt.plot(struct_size, insert_hash_times, label='Prestazioni inserimento hash', marker='o')
+    plt.xlabel("# di elementi nel hash")
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.0001)
+    plt.legend()
+    plt.savefig('insert_hash_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, search_hash_times, label='Prestazioni ricerca hash', marker='o')
+    plt.xlabel("# di elementi nel hash")
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.0001)
+    plt.legend()
+    plt.savefig('search_hash_plot.png')
+    plt.close()
+
+    plt.plot(struct_size, delete_hash_times, label='Prestazioni eliminazione hash', marker='o')
+    plt.xlabel("# di elementi nel hash")
+    plt.ylabel('Tempo medio (s)')
+    plt.ylim(0, 0.0001)
+    plt.legend()
+    plt.savefig('delete_hash_plot.png')
+    plt.close()
 
     # Grafici di inserimento
     plt.figure(figsize=(10, 6))
@@ -413,7 +483,7 @@ def main():
     plt.ylabel('Tempo medio (s)')
     plt.legend()
     plt.title('Confronto prestazioni di inserimento')
-    #plt.savefig('insert_comparison_plot.png')
+    plt.savefig('insert_comparison_plot.png')
     plt.close()
 
     # Grafici di ricerca
